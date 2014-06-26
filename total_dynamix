@@ -1,0 +1,135 @@
+#!/bin/bash
+
+# enable extended pattern matching
+shopt -s extglob
+
+# Function for formatted echo
+
+function fecho {
+# ISO 8601 time stamp
+echo "### $(date -u +"%Y-%m-%dT%H:%M:%SZ") ${1}"
+}
+
+## INPUT PARAMETERS ##
+. ./ins/parameters.in
+
+function compile {
+## COMPILE ##
+
+fecho "compiling dynamix-ga..."
+
+cd build
+if [[ $(uname) == "Darwin" ]]; then
+  ncores=$(sysctl -n hw.ncpu)
+elif [[ $(uname) == "Linux" ]]; then
+  ncores=$(grep processor /proc/cpuinfo | wc -l)
+else
+  ncores=1
+fi
+if [ $debug == 1 ]; then
+  make clean
+  make -j ${ncores} DEBUG_MAKE="1"
+else
+  make -j ${ncores}
+fi
+if [ $? == 0 ] ; then
+  fecho "done compiling!" && make install
+  cd ..
+else
+  fecho "failed to compile :("
+  exit
+fi
+}
+
+function run {
+## RUN THE PROGRAM! ##
+fecho "running dynamix-ga..."
+export OMP_NUM_THREADS=${nproc}
+export MKL_NUM_THREADS=${nproc}
+~/bin/mpich/bin/mpiexec ./bin/dynamix-ga
+if [ $? == 0 ] ; then
+  fecho "dynamix-ga done!"
+else
+  fecho "dynamix-ga did not run :("
+  exit
+fi
+# move outputs
+if [ justPlots == 0 ]; then
+  [ -d outs ] && rm -rf outs
+fi
+# move plot files
+[ -d figures ] && rm -rf figures/*
+mkdir -p figures
+chmod 755 *.plt
+mv *.plt figures/
+# remove progress file
+rm -f progress.tmp
+
+# analyze debug output
+if [ $debug == 1 ]; then
+  gprof ./bin/dynamix-ga ./outs/gmon.out > analysis.txt
+fi
+}
+
+function backup {
+## BACK UP FILES ##
+fecho "backing things up..."
+durr=backup/dynamix-ga_${1}
+mkdir -p $durr
+# cp all but backup dir
+cp -r !(backup) $durr
+fecho "all backed up!"
+}
+
+function plot {
+if [ -d figures ]; then
+  for plotfile in $(ls figures/*plt)
+  do
+    fecho "plotting ${plotfile}..."
+    ./$plotfile
+  done
+else
+  fecho "Nothing to plot."
+fi
+}
+
+BACKUP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+### This is where the script actually starts doing things. ###
+
+fecho "dynamix-ga run starting now..."
+fecho ""
+fecho ""
+
+while getopts ":b:" opt; do
+  case ${opt} in
+    b)
+      # specify name of backup directory
+      do_backup=1
+      BACKUP=${OPTARG}
+      ;;
+    \?)
+      echo "Invalid option: -${OPTARG}" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -${OPTARG} requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+
+# if modules are available, try to load them.
+if command -v module &> /dev/null; then
+  module load intel
+  module load cvode/2.7.0
+fi
+
+[ $do_compile == 1 ] && compile
+[ $do_run == 1 ] && run
+[ $do_plot == 1 ] && plot
+[ $do_backup == 1 ] && backup ${BACKUP}
+
+fecho "all done!"
+fecho ""
+fecho ""

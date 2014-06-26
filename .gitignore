@@ -1,0 +1,38 @@
+*.out
+*~
+*.avi
+*.mkv
+*.tmp
+*.log
+*.eps
+*.swp
+*plt
+*pdf
+divx2pass.log
+avg/
+img/
+backup/
+foo
+whoo
+debuggery/
+outs/
+figures/
+dynamix-ga
+fit.log
+weights.dat
+analysis.txt
+evolution.txt
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
