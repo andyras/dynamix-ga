@@ -43,8 +43,8 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 4; // Population
-  int ngen     = 2; // Generations
+  int popsize  = 40; // Population
+  int ngen     = 40; // Generations
   float pmut   = 0.03;
   float pcross = 0.65;
 
@@ -65,6 +65,9 @@ int main(int argc, char **argv)
   GA1DArrayGenome<double> genome(3, dynamixObjective);
   // define own initializer, can do the same for mutator and comparator
   genome.initializer(::Initializer);
+
+  omp_set_num_threads(2);
+  mkl_set_num_threads(2);
 
   // Now create the GA using the genome and run it. We'll use sigma truncation
   // scaling so that we can handle negative objective scores.

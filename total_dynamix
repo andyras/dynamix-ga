@@ -46,7 +46,7 @@ function run {
 fecho "running dynamix-ga..."
 export OMP_NUM_THREADS=${nproc}
 export MKL_NUM_THREADS=${nproc}
-~/bin/mpich/bin/mpiexec ./bin/dynamix-ga
+mpiexec ./bin/dynamix-ga
 if [ $? == 0 ] ; then
   fecho "dynamix-ga done!"
 else
