@@ -5,12 +5,16 @@
 #include <unistd.h>
 #include <ga-mpi/ga.h>
 #include <ga-mpi/std_stream.h>
-#include "mpi.h"
+#include <mpi.h>
 #include <sys/wait.h>
 #include <string>
 
-#include "dynamix.hpp"
-#include "propagate.hpp"
+#include <dynamix.hpp>
+#include <propagate.hpp>
+
+#include "objective.hpp"
+
+#define DEBUG
 
 // This are the declaration of the objective functions which are defined later.
 float objective(GAGenome &);
@@ -122,9 +126,16 @@ float dynamixObjective(GAGenome &c) {
 
   // assign parameters from GA /////////////////////////////////////////////////
 
+#ifdef DEBUG
+  std::cout << "Value of gamma1 is: " << g1 << std::endl;
+  std::cout << "Value of gamma1 is: " << g2 << std::endl;
+  std::cout << "Value of gamma1 is: " << g1_c << std::endl;
+#endif
+
   p.gamma1 = g1;
   p.gamma2 = g2;
   p.gamma1_c = g1_c;
+  p.inputFile = "/Users/andyras/git/dynamix-ga/ins/parameters.in";
 
   initialize(&p);
 
@@ -144,7 +155,10 @@ float dynamixObjective(GAGenome &c) {
   }
 
   // calculate value of objective function /////////////////////////////////////
-  // output = obj_tkpeak(&p);
+#ifdef DEBUG
+  std::cout << "Calculating value of objective function..." << std::endl;
+#endif
+  output = obj_tcpeak(&p);
 
   std::cout << "whoo" << std::endl;
 
