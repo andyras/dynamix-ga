@@ -97,21 +97,6 @@ int main(int argc, char **argv)
   return 0;
 }
 
-float objective(GAGenome &c)
-{
-  ///GABin2DecGenome &genome = (GABin2DecGenome &)c;
-  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
-  float x, y, error;
-
-  x = genome.gene(0);
-  y = genome.gene(1);
-
-  // Function with local minima. The lowest is located at (5/2*PI, 5/2*PI)
-  error = ((1.-sin(x)*sin(y))+sqrt((x-M_PI*2.5)*(x-M_PI*2.5)+(y-M_PI*2.5)*(y-M_PI*2.5))/10.0)/2.5;
-
-  return error;
-}
-
 float dynamixObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
   // get MPI rank and size
@@ -119,145 +104,27 @@ float dynamixObjective(GAGenome &c) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  // variables and output
+  // variables and output value
   double g1 = genome.gene(0);
   double g2 = genome.gene(1);
   double g1_c = genome.gene(2);
   float output = 1.0;
 
-  // array of strings for commands + arguments
-  char * args [10];
-  for (int ii = 0; ii < 10; ii++) {
-    args[ii] = new char [1000];
-  }
-
-  std::string arg = "/extra/scratch/foo";
-
-  // names for original directory and job directory
-  // TODO pass as cmd line params
-  std::string tmpDir ("/extra/scratch/dynamix");
-  // job directory name
-  char jobFmt [] = "%s%.12e_%.12e_%.12e_%d_%d";
-  char jobDir [1000];
-  sprintf(jobDir, jobFmt, tmpDir.c_str(), g1, g2, g1_c, rank, size);
-  std::cout << jobDir << std::endl;
-  std::string dynDir ("/home/andyras/git/dynamix-ga/");
-  std::string dynInsDir (dynDir + "ins/");
-  std::string dynamix (dynDir + "bin/dynamix-ga");
-  std::string changeParam (dynDir + "tools/changeParam.py");
-  char sciFmt [] = "%.12e";
-  char g1Str [100];
-  char g2Str [100];
-  char g1_cStr [100];
-  sprintf(g1Str, sciFmt, g1);
-  sprintf(g2Str, sciFmt, g2);
-  sprintf(g1_cStr, sciFmt, g1_c);
-
-  std::string jobInsDir (jobDir + std::string("/ins/"));
-  std::string jobOutsDir (jobDir + std::string("/outs/"));
-
-  // construct arguments
-  for (int ii = 0; ii < 10; ii++) {
-    delete [] args[ii];
-    args[ii] = new char [1000];
-  }
-
-  // for debugging
-  jobInsDir = "./ins/";
-  jobOutsDir = "/tmp/";
-
-  strncpy(args[0], dynamix.c_str(), dynamix.length() + 1);
-  strncpy(args[1], "-i", strlen("-i") + 1);
-  strncpy(args[2], jobInsDir.c_str(), jobInsDir.length() + 1);
-  strncpy(args[3], "-o", strlen("-o") + 1);
-  strncpy(args[4], jobOutsDir.c_str(), jobOutsDir.length() + 1);
-  args[5] = NULL;
-
-  fprintf(stdout, "COMMAND:");
-  for (int ii = 0; ii < 10; ii++) fprintf(stdout, " %s", args[ii]);
-  fprintf(stdout, "\n");
-
-  dynamixMain(5, args);
-
-  // ---- check for success ---- //
-  //
-  // ---- read in outputs ---- //
-  //
-  // ---- calculate objective ---- //
-  //
-  // ---- remove job directory ---- //
-
-  // clean up
-  for (int ii = 0; ii < 10; ii++) {
-    delete [] args[ii];
-  }
-
-  return output;
-}
-
-void Initializer(GAGenome &g) {
-  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
-
-  // there are two genes
-  genome.gene(0, GARandomFloat(0.0,5*M_PI));
-  genome.gene(1, GARandomFloat(0.0,5*M_PI));
-  genome.gene(2, GARandomFloat(0.0,5*M_PI));
-
-  return;
-}
-
-int dynamixMain (int argc, char * argv[]) {
   // Struct of parameters //////////////////////////////////////////////////////
 
   Params p;
 
-  // process command line flags ////////////////////////////////////////////////
-
-  opterr = 0;
-  int c;
-  std::string insDir;
-  /* process command line options */
-  while ((c = getopt(argc, argv, "i:o:")) != -1) {
-    switch (c) {
-      case 'i':
-        // check that it ends in a slash
-        insDir = optarg;
-        if (strcmp(&(insDir.at(insDir.length() - 1)), "/")) {
-          std::cerr << "ERROR: option -i requires argument ("
-                    << insDir << ") to have a trailing slash (/)." << std::endl;
-          return 1;
-        }
-        else {
-          // ---- assign input files ---- //
-          p.inputFile = insDir + "parameters.in";
-          p.cEnergiesInput = insDir + "c_energies.in";
-          p.bEnergiesInput = insDir + "b_energies.in";
-          p.VNoBridgeInput = insDir + "Vnobridge.in";
-          p.VBridgeInput = insDir + "Vbridge.in";
-        }
-        break;
-      case 'o':
-        p.outputDir = optarg;
-        break;
-      case '?':
-        if (optopt == 'i') {
-          fprintf(stderr, "Option -%c requires a directory argument.\n", optopt);
-        }
-        else if (isprint(optopt)) {
-          fprintf(stderr, "Unknown option -%c.\n", optopt);
-        }
-        else {
-          fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-        }
-        return 1;
-      default:
-        continue;
-    }
-  }
-
   // assign parameters from input file /////////////////////////////////////////
 
   assignParams(p.inputFile.c_str(), &p);
+
+  initialize(&p);
+
+  // assign parameters from GA /////////////////////////////////////////////////
+
+  p.gamma1 = g1;
+  p.gamma2 = g2;
+  p.gamma1_c = g1_c;
 
   initialize(&p);
 
@@ -276,7 +143,21 @@ int dynamixMain (int argc, char * argv[]) {
     propagate(&p);
   }
 
+  // calculate value of objective function /////////////////////////////////////
+  // output = obj_tkpeak(&p);
+
   std::cout << "whoo" << std::endl;
 
-  return 0;
+  return output;
+}
+
+void Initializer(GAGenome &g) {
+  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
+
+  // there are two genes
+  genome.gene(0, GARandomFloat(0.0,5*M_PI));
+  genome.gene(1, GARandomFloat(0.0,5*M_PI));
+  genome.gene(2, GARandomFloat(0.0,5*M_PI));
+
+  return;
 }
