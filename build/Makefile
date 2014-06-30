@@ -13,11 +13,12 @@ BINDIR = ../bin
 
 # compiler
 CPP = $(HOME)/bin/mpich/bin/mpic++
+CPP = mpic++
 
 CPPFLAGS = -O3 -Wall -std=c++11 -fopenmp
-LDFLAGS = -lsundials_cvode -lsundials_nvecserial
 INCLUDES = -I$(INCDIR)
 
+# this should be first in linking order because it depends on sundials
 # dynamix source directory
 DYNAMIXDIR = $(HOME)/git/dynamix/dm/build
 INCLUDES += -I$(DYNAMIXDIR)/include
@@ -27,6 +28,8 @@ LDFLAGS += -L$(DYNAMIXDIR)/lib -ldynamix
 GALIBDIR = $(HOME)/git/GALib-mpi
 INCLUDES += -I$(GALIBDIR)
 LDFLAGS += -L$(GALIBDIR)/ga-mpi -lga-mpi
+
+LDFLAGS += -lsundials_cvode -lsundials_nvecserial
 
 # basic compiler-dependent flags
 ifeq ($(CPP),icpc)
