@@ -12,10 +12,10 @@ nproc=2
 wavefunction=0				# 1 => wavefunction; 0 => density matrix
 coherent=1				# 1 => \rho = \ket{\psi}\bra{\psi}; 0 => \rho_ij = 0
 justPlots=0				# just make plots, no propagation or other output
-timedepH=1				# if H is TD, use CVODE, else diag H and propogate
+timedepH=0				# if H is TD, use CVODE, else diag H and propogate
 analytical=0				# turn on analytical propagation
-kinetic=1				# kinetic relaxation model
-kineticQD=1				# kinetic relaxation model in QD
+kinetic=0				# kinetic relaxation model
+kineticQD=0				# kinetic relaxation model in QD
 dynamicMu=0				# for kinetic model, calculate Fermi level dynamically
 dynamicMuQD=0				# for kinetic model, calculate Fermi level dynamically on QD
 rta=0					# use relaxation time approximation (RTA)
@@ -33,7 +33,7 @@ numOutputSteps=300			# number of output timesteps
 kBandEdge=0.00				# lower band edge of bulk conduction band (a.u.)
 kBandTop=0.01				# upper band edge of bulk conduction band (a.u.)
 lBandTop=-0.01				# upper band edge of bulk valence band (a.u.)
-Nk=11					# number of k states to have
+Nk=101					# number of k states to have
 bulk_gap=0.01				# bulk band gap (a.u.)
 valenceBand=0.01			# bulk valence band width
 Nl=0					# number of bulk valence band states

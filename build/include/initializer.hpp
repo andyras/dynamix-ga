@@ -5,6 +5,8 @@
 
 #include "params.hpp"
 
-void init_tcprob(GAGenome &c, Params * p);
+void init_gammas(GAGenome &c, Params * p);
+
+void init_wavepacket(GAGenome &c, Params * p);
 
 #endif

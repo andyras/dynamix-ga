@@ -13,6 +13,7 @@
 #include <propagate.hpp>
 
 #include "objective.hpp"
+#include "initializer.hpp"
 
 #define DEBUG
 
@@ -42,7 +43,7 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 2; // Population
+  int popsize  = 4; // Population
   int ngen     = 2; // Generations
   float pmut   = 0.03;
   float pcross = 0.65;
@@ -108,10 +109,7 @@ float dynamixObjective(GAGenome &c) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  // variables and output value
-  double g1 = genome.gene(0);
-  double g2 = genome.gene(1);
-  double g1_c = genome.gene(2);
+  // output value
   float output = 1.0;
 
   // Struct of parameters //////////////////////////////////////////////////////
@@ -124,20 +122,9 @@ float dynamixObjective(GAGenome &c) {
 
   initialize(&p);
 
-  // assign parameters from GA /////////////////////////////////////////////////
-
-#ifdef DEBUG
-  std::cout << "Value of gamma1 is: " << g1 << std::endl;
-  std::cout << "Value of gamma1 is: " << g2 << std::endl;
-  std::cout << "Value of gamma1 is: " << g1_c << std::endl;
-#endif
-
-  p.gamma1 = g1;
-  p.gamma2 = g2;
-  p.gamma1_c = g1_c;
-  p.inputFile = "/Users/andyras/git/dynamix-ga/ins/parameters.in";
-
-  initialize(&p);
+  // assign GA parameters
+  // make sure this function matches the objective you are using
+  init_wavepacket(c, &p);
 
   // set number of processors for OpenMP ///////////////////////////////////////
 
@@ -168,10 +155,9 @@ float dynamixObjective(GAGenome &c) {
 void Initializer(GAGenome &g) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
 
-  // there are two genes
-  genome.gene(0, GARandomFloat(0.0,5*M_PI));
-  genome.gene(1, GARandomFloat(0.0,5*M_PI));
-  genome.gene(2, GARandomFloat(0.0,5*M_PI));
+  genome.gene(0, GARandomFloat(0.0,0.01));
+  genome.gene(1, GARandomFloat(0.0,0.01));
+  genome.gene(2, GARandomFloat(0.0,0.01));
 
   return;
 }
