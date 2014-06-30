@@ -7,12 +7,12 @@ debug=0
 
 ## START INPUT PARAMETERS ##
 # number of processors to use with OpenMP
-nproc=2
+nproc=1
 # method parameters #
-wavefunction=0				# 1 => wavefunction; 0 => density matrix
+wavefunction=1				# 1 => wavefunction; 0 => density matrix
 coherent=1				# 1 => \rho = \ket{\psi}\bra{\psi}; 0 => \rho_ij = 0
 justPlots=0				# just make plots, no propagation or other output
-timedepH=0				# if H is TD, use CVODE, else diag H and propogate
+timedepH=1				# if H is TD, use CVODE, else diag H and propogate
 analytical=0				# turn on analytical propagation
 kinetic=0				# kinetic relaxation model
 kineticQD=0				# kinetic relaxation model in QD
@@ -22,7 +22,7 @@ rta=0					# use relaxation time approximation (RTA)
 rtaQD=0					# use relaxation time approximation (RTA) on QD
 dephasing=0				# turn on dephasing (gamma2)
 progressFile=0				# create file to show progress of run
-progressStdout=1			# show progress in stdout
+progressStdout=0			# show progress in stdout
 # numerical parameters #
 abstol=1.0e-12				# absolute tolerance
 reltol=1.0e-12				# relative tolerance
@@ -38,7 +38,7 @@ bulk_gap=0.01				# bulk band gap (a.u.)
 valenceBand=0.01			# bulk valence band width
 Nl=0					# number of bulk valence band states
 #bulkGaussSigma=0.002217514892873433	# width of initial Gaussian in bulk (a.u.)
-bulkGaussSigma=0.001			# width of initial Gaussian in bulk (a.u.)
+bulkGaussSigma=0.0003			# width of initial Gaussian in bulk (a.u.)
 bulkGaussMu=0.005			# position of initial Gaussian above band edge (a.u.)
 me=0.078				# effective mass of electron
 mh=0.11					# effective mass of hole

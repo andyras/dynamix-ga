@@ -43,8 +43,8 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 4; // Population
-  int ngen     = 2; // Generations
+  int popsize  = 50; // Population
+  int ngen     = 100; // Generations
   float pmut   = 0.03;
   float pcross = 0.65;
 
@@ -88,6 +88,9 @@ int main(int argc, char **argv)
   ga.mpi_tasks(mpi_tasks);
   ga.evolve(seed);
 
+  omp_set_num_threads(1);
+  mkl_set_num_threads(1);
+
   // Dump the GA results to file
   if(mpi_rank == 0)
   {
@@ -108,6 +111,10 @@ float dynamixObjective(GAGenome &c) {
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+#ifdef DEBUG
+  std::cout << "rank: " << rank << " of " << size << "\n";
+#endif
 
   // output value
   float output = 1.0;
