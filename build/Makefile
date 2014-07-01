@@ -21,12 +21,13 @@ INCLUDES = -I$(INCDIR)
 # this should be first in linking order because it depends on sundials
 # dynamix source directory
 DYNAMIXDIR = $(HOME)/git/dynamix/dm/build
-INCLUDES += -I$(DYNAMIXDIR)/include
-LDFLAGS += -L$(DYNAMIXDIR)/lib -ldynamix
+INCLUDES += -I$(DYNAMIXDIR)/include -I$(HOME)/bin/include
+LDFLAGS += -L$(DYNAMIXDIR)/lib -ldynamix -L$(HOME)/bin/lib
 
 # GALib-mpi source directory
 GALIBDIR = $(HOME)/git/GALib-mpi
 INCLUDES += -I$(GALIBDIR)
+#LDFLAGS += -L$(GALIBDIR)/ga-mpi -l/home/andyras/git/GAlib-mpi/ga-mpi/libga-mpi.a
 LDFLAGS += -L$(GALIBDIR)/ga-mpi -lga-mpi
 
 LDFLAGS += -lsundials_cvode -lsundials_nvecserial
@@ -63,7 +64,7 @@ $(BIN): $(OBJECTS)
 
 # automatic rule for building objects
 $(OBJDIR)/%.o: %.cpp
-	$(CPP) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
+	$(CPP) $(CPPFLAGS) -c $< -o $@ $(INCLUDES)
 
 # all objects depend on object directory
 $(OBJECTS): | $(OBJDIR)

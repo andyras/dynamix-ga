@@ -44,8 +44,8 @@ int main(int argc, char **argv)
 
   // Declare variables for the GA parameters and set them to some default values.
   int popsize  = 40; // Population
-  int ngen     = 40; // Generations
-  float pmut   = 0.03;
+  int ngen     = 200; // Generations
+  float pmut   = 0.05;
   float pcross = 0.65;
 
   // popsize / mpi_tasks must be an integer
@@ -125,6 +125,13 @@ float dynamixObjective(GAGenome &c) {
   // Struct of parameters //////////////////////////////////////////////////////
 
   Params p;
+  // TODO XXX FUGLINESS HARD-CODING
+  std::string jobPrefix = "/home/andyras/git/dynamix-ga/";
+  p.inputFile = jobPrefix + "ins/parameters.in";
+  p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
+  p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
+  p.VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
+  p.VBridgeInput = jobPrefix + "ins/Vbridge.in";
 
   // assign parameters from input file /////////////////////////////////////////
 
