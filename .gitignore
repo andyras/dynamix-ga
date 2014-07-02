@@ -22,6 +22,7 @@ fit.log
 weights.dat
 analysis.txt
 evolution.txt
+hoagie.sh
 
 # Compiled Object files
 *.slo

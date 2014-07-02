@@ -43,10 +43,11 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 24; // Population
+  int popsize  = 12*2; // Population
   int ngen     = 200; // Generations
-  float pmut   = 0.05;
+  float pmut   = 0.25;
   float pcross = 0.65;
+  float pconv = 1.01; // convergence
 
   // popsize / mpi_tasks must be an integer
   popsize = mpi_tasks * int((double)popsize/(double)mpi_tasks+0.999);
@@ -66,8 +67,8 @@ int main(int argc, char **argv)
   // define own initializer, can do the same for mutator and comparator
   genome.initializer(::Initializer);
 
-  omp_set_num_threads(2);
-  mkl_set_num_threads(2);
+  omp_set_num_threads(1);
+  mkl_set_num_threads(1);
 
   // Now create the GA using the genome and run it. We'll use sigma truncation
   // scaling so that we can handle negative objective scores.
@@ -78,6 +79,8 @@ int main(int argc, char **argv)
   ga.nGenerations(ngen);
   ga.pMutation(pmut);
   ga.pCrossover(pcross);
+  ga.pConvergence(pconv);
+  ga.terminator(GAGeneticAlgorithm::TerminateUponConvergence);
   ga.scaling(scaling);
   if(mpi_rank == 0)
     ga.scoreFilename("evolution.txt");
@@ -126,7 +129,7 @@ float dynamixObjective(GAGenome &c) {
 
   Params p;
   // TODO XXX FUGLINESS HARD-CODING
-  std::string jobPrefix = "/home/andyras/git/dynamix-ga/";
+  std::string jobPrefix = "./";
   p.inputFile = jobPrefix + "ins/parameters.in";
   p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
   p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
