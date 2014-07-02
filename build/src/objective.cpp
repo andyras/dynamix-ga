@@ -37,10 +37,11 @@ double obj_tcpeak(Params * p) {
     }
   }
 
-  f = findArrayMaximum(&(tcprobs[0]), p->Nc)/summ;
+  f = 1.0 - findArrayMaximum(&(tcprobs[0]), p->Nc)/summ;
 #ifdef DEBUG
-  std::cout << "Value of f is " << f << std::endl;
+  std::cout << "Value of f is 1.0 - " << findArrayMaximum(&(tcprobs[0]), p->Nc) << "/" << summ << " = " << f << std::endl <<
+    "sigma: " << p->bulkGaussSigma << " mu: " << p->bulkGaussMu << " f: " << f << std::endl;
 #endif
 
-  return (1.0 - f);
+  return f;
 }

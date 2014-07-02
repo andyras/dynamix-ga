@@ -43,7 +43,7 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 40; // Population
+  int popsize  = 24; // Population
   int ngen     = 200; // Generations
   float pmut   = 0.05;
   float pcross = 0.65;

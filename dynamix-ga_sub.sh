@@ -6,7 +6,7 @@
 #$ -m bae -M andyras@gmail.com
 #$ -o stdout.log
 #$ -e stderr.log
-#$ -pe orte 128
+#$ -pe orte 8
 
 function onKill {
 echo "DANGER!"
