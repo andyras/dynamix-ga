@@ -43,7 +43,7 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 12*2; // Population
+  int popsize  = 12*4; // Population
   int ngen     = 200; // Generations
   float pmut   = 0.25;
   float pcross = 0.65;
@@ -143,7 +143,8 @@ float dynamixObjective(GAGenome &c) {
   initialize(&p);
 
   // assign GA parameters
-  // make sure this function matches the objective you are using
+  // this function is independent of the objective you are using. It determines
+  // what the relevant parameters are for the optimization.
   init_wavepacket(c, &p);
 
   // set number of processors for OpenMP ///////////////////////////////////////
@@ -165,7 +166,11 @@ float dynamixObjective(GAGenome &c) {
 #ifdef DEBUG
   std::cout << "Calculating value of objective function..." << std::endl;
 #endif
-  output = obj_tcpeak(&p);
+  // set 'output' according to an objective function ///////////////////////////
+  // output = obj_tcpeak(&p);
+  // output = obj_Pcavg(&p);
+  // output = obj_Pcavg_after_peak(&p);
+  output = obj_maxFinal(&p);
 
   std::cout << "whoo" << std::endl;
 
