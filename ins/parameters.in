@@ -9,13 +9,13 @@ debug=0
 # number of processors to use with OpenMP
 nproc=1
 # method parameters #
-wavefunction=1				# 1 => wavefunction; 0 => density matrix
+wavefunction=0				# 1 => wavefunction; 0 => density matrix
 coherent=1				# 1 => \rho = \ket{\psi}\bra{\psi}; 0 => \rho_ij = 0
 justPlots=0				# just make plots, no propagation or other output
 timedepH=1				# if H is TD, use CVODE, else diag H and propogate
 analytical=0				# turn on analytical propagation
-kinetic=0				# kinetic relaxation model
-kineticQD=0				# kinetic relaxation model in QD
+kinetic=1				# kinetic relaxation model
+kineticQD=1				# kinetic relaxation model in QD
 dynamicMu=0				# for kinetic model, calculate Fermi level dynamically
 dynamicMuQD=0				# for kinetic model, calculate Fermi level dynamically on QD
 rta=0					# use relaxation time approximation (RTA)
@@ -70,9 +70,9 @@ laser_on=0
 parabolicCoupling=0
 scale_bubr=0
 scale_brqd=0
-scale_buqd=1
+scale_buqd=0
 scale_laser=1
-bridge_on=0
+bridge_on=1
 random_phase=0				# turning this on may break normalization
 random_seed=-1				# -1 for random seed, otherwise specify seed
 # Torsional parameters #

@@ -20,6 +20,7 @@
 // This are the declaration of the objective functions which are defined later.
 float objective(GAGenome &);
 float dynamixObjective(GAGenome &);
+float dualObjective(GAGenome &);
 int dynamixMain (int argc, char * argv[]);
 
 // declare Initializer also
@@ -63,7 +64,7 @@ int main(int argc, char **argv)
   // Create the template genome using the phenotype map we just made.
   ///GABin2DecGenome genome(map, objective);
   //GA1DArrayGenome<double> genome(2, objective);
-  GA1DArrayGenome<double> genome(3, dynamixObjective);
+  GA1DArrayGenome<double> genome(3, dualObjective);
   // define own initializer, can do the same for mutator and comparator
   genome.initializer(::Initializer);
 
@@ -156,11 +157,9 @@ float dynamixObjective(GAGenome &c) {
 
   makePlots(&p);
 
-  // only do propagation if not just making plots //////////////////////////////
+  // propagate /////////////////////////////////////////////////////////////////
 
-  if (! p.justPlots) {
-    propagate(&p);
-  }
+  propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
 #ifdef DEBUG
@@ -175,6 +174,82 @@ float dynamixObjective(GAGenome &c) {
   std::cout << "whoo" << std::endl;
 
   return output;
+}
+
+float dualObjective(GAGenome &c) {
+  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
+  // get MPI rank and size
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+#ifdef DEBUG
+  std::cout << "rank: " << rank << " of " << size << "\n";
+#endif
+
+  // output value
+  float output1 = 1.0;  // objective value 1
+  float output2 = 1.0;  // objective value 2
+
+  // Struct of parameters //////////////////////////////////////////////////////
+
+  Params p;
+  // TODO XXX FUGLINESS HARD-CODING
+  std::string jobPrefix = "./";
+  p.inputFile = jobPrefix + "ins/parameters.in";
+  p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
+  p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
+  p.VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
+  p.VBridgeInput = jobPrefix + "ins/Vbridge.in";
+
+  // coherent propagation //////////////////////////////////////////////////////
+
+  // assign parameters from input file /////////////////////////////////////////
+
+  assignParams(p.inputFile.c_str(), &p);
+  p.coherent = 1;
+  initialize(&p);
+
+  // assign GA parameters
+  // this function is independent of the objective you are using. It determines
+  // what the relevant parameters are for the optimization.
+  init_wavepacket(c, &p);
+
+  // Make plot files ///////////////////////////////////////////////////////////
+
+  makePlots(&p);
+
+  // set number of processors for OpenMP ///////////////////////////////////////
+
+  omp_set_num_threads(p.nproc);
+  mkl_set_num_threads(p.nproc);
+
+  // propagate /////////////////////////////////////////////////////////////////
+
+  propagate(&p);
+
+  // calculate value of objective function /////////////////////////////////////
+#ifdef DEBUG
+  std::cout << "Calculating value of objective function..." << std::endl;
+#endif
+  // set 'output' according to an objective function ///////////////////////////
+  // output = obj_tcpeak(&p);
+  // output = obj_Pcavg(&p);
+  // output = obj_Pcavg_after_peak(&p);
+  output1 = obj_maxFinal(&p);
+
+  // incoherent propagation ////////////////////////////////////////////////////
+  p.coherent = 0;
+  initialize(&p);
+  init_wavepacket(c, &p);
+#ifdef DEBUG
+  std::cout << "Calculating value of objective function again..." << std::endl;
+#endif
+  output2 = obj_maxFinal(&p);
+
+  std::cout << "whoo" << std::endl;
+
+  return abs(output1 - output2);
 }
 
 void Initializer(GAGenome &g) {
