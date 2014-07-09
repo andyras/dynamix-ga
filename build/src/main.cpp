@@ -242,6 +242,7 @@ float dualObjective(GAGenome &c) {
   p.coherent = 0;
   initialize(&p);
   init_wavepacket(c, &p);
+  propagate(&p);
 #ifdef DEBUG
   std::cout << "Calculating value of objective function again..." << std::endl;
 #endif
