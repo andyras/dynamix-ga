@@ -213,7 +213,7 @@ float dualObjective(GAGenome &c) {
   // assign GA parameters
   // this function is independent of the objective you are using. It determines
   // what the relevant parameters are for the optimization.
-  init_wavepacket(c, &p);
+  init_gammas(c, &p);
 
   // Make plot files ///////////////////////////////////////////////////////////
 
@@ -239,18 +239,26 @@ float dualObjective(GAGenome &c) {
   output1 = obj_maxFinal(&p);
 
   // incoherent propagation ////////////////////////////////////////////////////
-  p.coherent = 0;
-  initialize(&p);
-  init_wavepacket(c, &p);
-  propagate(&p);
+  Params p2;
+  assignParams(p.inputFile.c_str(), &p2);
+  p2.coherent = 0;
+  initialize(&p2);
+  init_gammas(c, &p2);
+  propagate(&p2);
 #ifdef DEBUG
   std::cout << "Calculating value of objective function again..." << std::endl;
 #endif
-  output2 = obj_maxFinal(&p);
+  output2 = obj_maxFinal(&p2);
 
   std::cout << "whoo" << std::endl;
 
-  return abs(output1 - output2);
+  double f = fabs(output1 - output2);
+
+#ifdef DEBUG
+  std::cout << "Returning f = " << f << std::endl;
+#endif
+
+  return f;
 }
 
 void Initializer(GAGenome &g) {
