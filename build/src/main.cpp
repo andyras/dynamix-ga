@@ -258,8 +258,6 @@ float dualObjective(GAGenome &c) {
   output2 = obj_maxFinal(&p);
   std::cout << "[" << pid << "] " << "Objective: " << output2 << std::endl;
 
-  std::cout << "whoo" << std::endl;
-
   double f = fabs(output1 - output2);
   std::cout << "[" << pid << "] " << "Combined objective: " << f << std::endl;
 
