@@ -26,20 +26,20 @@ progressStdout=0			# show progress in stdout
 # numerical parameters #
 abstol=1.0e-12				# absolute tolerance
 reltol=1.0e-12				# relative tolerance
-tout=50000				# final time reached by solver (a.u.)
+tout=10000				# final time reached by solver (a.u.)
 numsteps=10000				# number of timesteps
 numOutputSteps=500			# number of output timesteps
 # bulk parameters #
 kBandEdge=0.00				# lower band edge of bulk conduction band (a.u.)
 kBandTop=0.01				# upper band edge of bulk conduction band (a.u.)
 lBandTop=-0.01				# upper band edge of bulk valence band (a.u.)
-Nk=2					# number of k states to have
+Nk=25					# number of k states to have
 bulk_gap=0.01				# bulk band gap (a.u.)
 valenceBand=0.01			# bulk valence band width
 Nl=0					# number of bulk valence band states
 #bulkGaussSigma=0.002217514892873433	# width of initial Gaussian in bulk (a.u.)
-bulkGaussSigma=0.00155291			# width of initial Gaussian in bulk (a.u.)
-bulkGaussMu=0.00499805			# position of initial Gaussian above band edge (a.u.)
+bulkGaussSigma=0.003			# width of initial Gaussian in bulk (a.u.)
+bulkGaussMu=0.005			# position of initial Gaussian above band edge (a.u.)
 me=0.078				# effective mass of electron
 mh=0.11					# effective mass of hole
 me_c=0.4				# effective mass of electron on QD
@@ -48,9 +48,9 @@ X2=1512.2873345935727			# "Bohr radius" for material, inverse spacing in k-space
 # physical parameters #
 temperature=4e2				# temperature in Kelvin
 EF=0.0					# Fermi level in bulk
-gamma1=1e-2				# \gamma_1 in RTA (relaxation rate)
-gamma1_c=1e-3				# \gamma_1 in RTA (relaxation rate) on QD
-gamma2=1e-3				# \gamma_2 in RTA (dephasing rate)
+gamma1=0.00826471				# \gamma_1 in RTA (relaxation rate)
+gamma1_c=0.00799141				# \gamma_1 in RTA (relaxation rate) on QD
+gamma2=0.00144902				# \gamma_2 in RTA (dephasing rate)
 # laser parameters #
 muLK=1e0				# transition dipole moment from l to k (dipole a.u.)
 pumpFWHM=4000				# FWHM of pump pulse (time a.u.)

@@ -1,6 +1,6 @@
 #include "objective.hpp"
 
-#define DEBUG
+// #define DEBUG
 
 double obj_tcpeak(Params * p) {
   // This function returns the peak total population on the QD states

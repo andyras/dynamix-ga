@@ -1,6 +1,9 @@
 #ifndef __OBJECTIVE__
 #define __OBJECTIVE__
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "params.hpp"
 
 double obj_tcpeak(Params * p);

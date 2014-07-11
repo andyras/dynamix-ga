@@ -15,7 +15,7 @@ BINDIR = ../bin
 CPP = $(HOME)/bin/mpich/bin/mpic++
 CPP = mpic++
 
-CPPFLAGS = -O3 -Wall -std=c++11 -fopenmp
+CPPFLAGS = -O0 -Wall -std=c++11 -fopenmp
 INCLUDES = -I$(INCDIR)
 
 # this should be first in linking order because it depends on sundials

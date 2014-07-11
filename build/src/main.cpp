@@ -16,7 +16,7 @@
 #include "initializer.hpp"
 #include "output.hpp"
 
-#define DEBUG
+// #define DEBUG
 
 // This are the declaration of the objective functions which are defined later.
 float objective(GAGenome &);
@@ -102,13 +102,15 @@ int main(int argc, char **argv)
   // Dump the GA results to file
   if(mpi_rank == 0)
   {
-    genome = ga.statistics().bestIndividual();
-    std::cout << "GA result: Gene 0: " << genome.gene(0);
-    for (int ii = 1; ii < genome.length(); ii++) {
-      std::cout << " Gene " << ii << ": " << genome.gene(ii);
+    GA1DArrayGenome<double> &bestGenome = (GA1DArrayGenome<double> &)ga.population().best();
+
+    std::cout << "Best: Gene 0: " << bestGenome.score();
+    for (int ii = 0; ii < bestGenome.length(); ii++) {
+      std::cout << " Gene " << ii << ": " << bestGenome.gene(ii);
     }
+    std::cout << " Score: " << ga.population().best().score();
     std::cout << std::endl;
-  }
+    }
 
   MPI_Finalize();
 
@@ -175,12 +177,11 @@ float dynamixObjective(GAGenome &c) {
   // output = obj_Pcavg_after_peak(&p);
   output = obj_maxFinal(&p);
 
-  std::cout << "whoo" << std::endl;
-
   return output;
 }
 
 float dualObjective(GAGenome &c) {
+  int pid = getpid();
   // get MPI rank and size
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -242,6 +243,7 @@ float dualObjective(GAGenome &c) {
   // output = obj_Pcavg(&p);
   // output = obj_Pcavg_after_peak(&p);
   output1 = obj_maxFinal(&p);
+  std::cout << "[" << pid << "] " << "Objective: " << output1 << std::endl;
 
   // incoherent propagation ////////////////////////////////////////////////////
   assignParams(p.inputFile.c_str(), &p);
@@ -254,14 +256,12 @@ float dualObjective(GAGenome &c) {
   std::cout << "Calculating value of objective function again..." << std::endl;
 #endif
   output2 = obj_maxFinal(&p);
+  std::cout << "[" << pid << "] " << "Objective: " << output2 << std::endl;
 
   std::cout << "whoo" << std::endl;
 
   double f = fabs(output1 - output2);
-
-#ifdef DEBUG
-  std::cout << "Returning f = " << f << std::endl;
-#endif
+  std::cout << "[" << pid << "] " << "Combined objective: " << f << std::endl;
 
   return f;
 }
