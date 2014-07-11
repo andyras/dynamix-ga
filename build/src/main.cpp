@@ -14,6 +14,7 @@
 
 #include "objective.hpp"
 #include "initializer.hpp"
+#include "output.hpp"
 
 #define DEBUG
 
@@ -177,7 +178,6 @@ float dynamixObjective(GAGenome &c) {
 }
 
 float dualObjective(GAGenome &c) {
-  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
   // get MPI rank and size
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -215,6 +215,10 @@ float dualObjective(GAGenome &c) {
   // what the relevant parameters are for the optimization.
   init_gammas(c, &p);
 
+#ifdef DEBUG
+  print1DGenes(c);
+#endif
+
   // Make plot files ///////////////////////////////////////////////////////////
 
   makePlots(&p);
@@ -239,16 +243,15 @@ float dualObjective(GAGenome &c) {
   output1 = obj_maxFinal(&p);
 
   // incoherent propagation ////////////////////////////////////////////////////
-  Params p2;
-  assignParams(p.inputFile.c_str(), &p2);
-  p2.coherent = 0;
-  initialize(&p2);
-  init_gammas(c, &p2);
-  propagate(&p2);
+  assignParams(p.inputFile.c_str(), &p);
+  p.coherent = 0;
+  initialize(&p);
+  init_gammas(c, &p);
+  propagate(&p);
 #ifdef DEBUG
   std::cout << "Calculating value of objective function again..." << std::endl;
 #endif
-  output2 = obj_maxFinal(&p2);
+  output2 = obj_maxFinal(&p);
 
   std::cout << "whoo" << std::endl;
 
