@@ -45,7 +45,7 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 12*4; // Population
+  int popsize  = 4; // Population
   int ngen     = 200; // Generations
   float pmut   = 0.25;
   float pcross = 0.65;
@@ -103,9 +103,11 @@ int main(int argc, char **argv)
   if(mpi_rank == 0)
   {
     genome = ga.statistics().bestIndividual();
-    printf("GA result:\n");
-    printf("x = %f, y = %f\n",
-  genome.gene(0), genome.gene(1));
+    std::cout << "GA result: Gene 0: " << genome.gene(0);
+    for (int ii = 1; ii < genome.length(); ii++) {
+      std::cout << " Gene " << ii << ": " << genome.gene(ii);
+    }
+    std::cout << std::endl;
   }
 
   MPI_Finalize();
@@ -148,6 +150,7 @@ float dynamixObjective(GAGenome &c) {
   // this function is independent of the objective you are using. It determines
   // what the relevant parameters are for the optimization.
   init_wavepacket(c, &p);
+  print1DGenes(c);
 
   // set number of processors for OpenMP ///////////////////////////////////////
 
@@ -215,9 +218,7 @@ float dualObjective(GAGenome &c) {
   // what the relevant parameters are for the optimization.
   init_gammas(c, &p);
 
-#ifdef DEBUG
   print1DGenes(c);
-#endif
 
   // Make plot files ///////////////////////////////////////////////////////////
 
@@ -247,6 +248,7 @@ float dualObjective(GAGenome &c) {
   p.coherent = 0;
   initialize(&p);
   init_gammas(c, &p);
+  print1DGenes(c);
   propagate(&p);
 #ifdef DEBUG
   std::cout << "Calculating value of objective function again..." << std::endl;
