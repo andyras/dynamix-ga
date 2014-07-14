@@ -3,15 +3,27 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <mpi.h>
+
+#include <ga-mpi/ga.h>
+#include <dynamix.hpp>
+#include <propagate.hpp>
 
 #include "params.hpp"
+#include "gaparams.hpp"
+#include "initializer.hpp"
+#include "output.hpp"
 
-double obj_tcpeak(Params * p);
+float dynamixObjective(GAGenome &);
 
-double obj_Pcavg(Params * p);
+float dualObjective(GAGenome &);
 
-double obj_Pcavg_after_peak(Params * p);
+double objAcceptorPeak(Params * p);
 
-double obj_maxFinal(Params * p);
+double objAcceptorAvg(Params * p);
+
+double objAcceptorAvgAfterPeak(Params * p);
+
+double objAcceptorFinal(Params * p);
 
 #endif
