@@ -2,6 +2,7 @@
 #define __OUTPUT__
 
 #include <ga-mpi/ga.h>
+#include <mpi.h>
 #include <sys/types.h>
 #include <unistd.h>
 

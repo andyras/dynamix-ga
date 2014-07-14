@@ -1,18 +1,19 @@
 #ifndef __OBJECTIVE__
 #define __OBJECTIVE__
 
+#include <mpi.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <mpi.h>
 
-#include <ga-mpi/ga.h>
 #include <dynamix.hpp>
+#include <ga-mpi/ga.h>
 #include <propagate.hpp>
 
-#include "params.hpp"
 #include "gaparams.hpp"
 #include "initializer.hpp"
 #include "output.hpp"
+#include "params.hpp"
+#include "parser.hpp"
 
 float dynamixObjective(GAGenome &);
 

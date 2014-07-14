@@ -1,0 +1,11 @@
+## START INPUT PARAMETERS ##
+objectiveType=double
+objective=acceptorPeak
+doubleObjective=coherence
+variables=wavepacket
+minmax=min
+## END INPUT PARAMETERS ##
+
+[[Output Files]]
+#ga.out
+[[End]]

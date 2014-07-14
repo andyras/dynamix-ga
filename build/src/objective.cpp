@@ -19,6 +19,7 @@ float dynamixObjective(GAGenome &c) {
   // Struct of parameters //////////////////////////////////////////////////////
 
   GAParams gp;
+  assignGAParams("ins/ga.in", &gp);
   Params * p = &(gp.p);
   // TODO XXX FUGLINESS HARD-CODING
   std::string jobPrefix = "./";
@@ -86,6 +87,10 @@ float dynamixObjective(GAGenome &c) {
     exit(-1);
   }
 
+  int pid = getpid();
+  std::cout << "[" << pid << ":" << rank << "] " << "Objective: " << output << std::endl;
+
+
   return output;
 }
 
@@ -107,6 +112,7 @@ float dualObjective(GAGenome &c) {
   // Struct of parameters //////////////////////////////////////////////////////
 
   GAParams gp;
+  assignGAParams("ins/ga.in", &gp);
   Params * p = &(gp.p);
 
   // TODO XXX FUGLINESS HARD-CODING
@@ -179,7 +185,7 @@ float dualObjective(GAGenome &c) {
     exit(-1);
   }
 
-  std::cout << "[" << pid << "] " << "Objective: " << output1 << std::endl;
+  std::cout << "[" << pid << ":" << rank << "] " << "Objective 1: " << output1 << std::endl;
 
   // incoherent propagation ////////////////////////////////////////////////////
   assignParams(p->inputFile.c_str(), p);
@@ -217,24 +223,13 @@ float dualObjective(GAGenome &c) {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
       gp.objective << "not recognized." << std::endl;
     exit(-1);
-  }  std::cout << "[" << pid << "] " << "Objective: " << output2 << std::endl;
+  }
+  std::cout << "[" << pid << ":" << rank << "] " << "Objective 2: " << output2 << std::endl;
 
   double f = fabs(output1 - output2);
-  std::cout << "[" << pid << "] " << "Combined objective: " << f << std::endl;
+  std::cout << "[" << pid << ":" << rank << "] " << "Combined objective: " << f << std::endl;
 
   return f;
-}
-
-void Initializer(GAGenome &g) {
-  // This function is ignored, really, because I put everything in the functions
-  // I call that initialize both the genome and the Params class.
-  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
-
-  genome.gene(0, GARandomFloat(0.0,0.01));
-  genome.gene(1, GARandomFloat(0.0,0.01));
-  genome.gene(2, GARandomFloat(0.0,0.01));
-
-  return;
 }
 
 double objAcceptorPeak(Params * p) {

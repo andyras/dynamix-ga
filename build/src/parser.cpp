@@ -1,5 +1,7 @@
 #include "parser.hpp"
 
+// #define DEBUG
+
 void assignGAParams(std::string inputFile, GAParams * p) {
 /* assigns GA params to the Params struct from the input file */
   std::string line;
@@ -8,7 +10,7 @@ void assignGAParams(std::string inputFile, GAParams * p) {
   size_t equals_pos;
   size_t space_pos;
 
-#ifdef DEBUG_INPUT_PARSER
+#ifdef DEBUG
   std::cout << "\nParsing file: " << inputFile << "\n";
 #endif
 
@@ -44,7 +46,7 @@ void assignGAParams(std::string inputFile, GAParams * p) {
     param_val = line.substr(int(equals_pos)+1,int(space_pos)-int(equals_pos));
     // extract parameters
 #ifdef DEBUG
-    std::cout << "Parameter: " << input_param << std::endl << "New value: " << atof(param_val.c_str()) << std::endl;
+    std::cout << "Parameter: " << input_param << std::endl << "New value: " << param_val << std::endl;
 #endif
     if (input_param == "objectiveType") { p->objectiveType = param_val; }
     else if (input_param == "objective") { p->objective = param_val; }

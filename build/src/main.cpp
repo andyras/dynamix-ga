@@ -47,26 +47,17 @@ int main(int argc, char **argv)
   float pconv = 1.01; // convergence
 
   GAParams gp;
+  assignGAParams("ins/ga.in", &gp);
 
   // popsize / mpi_tasks must be an integer
   popsize = mpi_tasks * int((double)popsize/(double)mpi_tasks+0.999);
 
-  // Create the phenotype for two variables.  The number of bits you can use to
-  // represent any number is limited by the type of computer you are using.
-  // For this case we use 10 bits for each var, ranging the square domain [0,5*PI]x[0,5*PI]
-  ///GABin2DecPhenotype map;
-  ///GABin2DecPhenotype map;
-  ///map.add(10, 0.0, 5.0 * M_PI);
-  ///map.add(10, 0.0, 5.0 * M_PI);
-
-  // Create the template genome using the phenotype map we just made.
-  ///GABin2DecGenome genome(map, objective);
-  GA1DArrayGenome<double> genome(3, dynamixObjective);
+  float (*objective)(GAGenome &) = NULL; // pointer to objective function
   if (gp.objectiveType.compare("single") == 0) {
-    GA1DArrayGenome<double> genome(3, dynamixObjective);
+    objective = dynamixObjective;
   }
   else if (gp.objectiveType.compare("double") == 0) {
-    GA1DArrayGenome<double> genome(3, dualObjective);
+    objective = dualObjective;
   }
   else {
     std::cout << "WARNING [" << __FUNCTION__ << "]: " << "objective type" <<
@@ -74,18 +65,37 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  // define own initializer, can do the same for mutator and comparator
+  void (*initializer)(GAGenome &) = NULL; // pointer to initializer function
+  int genomeLength = 0;
   if (gp.variables.compare("g1g2g1_c") == 0) {
-    genome.initializer(::gammasInitializer);
+    initializer = ::gammasInitializer;
+    genomeLength = 3;
   }
   else if (gp.variables.compare("wavepacket") == 0) {
-    genome.initializer(::wavepacketInitializer);
+    initializer = ::wavepacketInitializer;
+    genomeLength = 2;
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
       gp.variables << "not recognized." << std::endl;
     exit(-1);
   }
+
+  GA1DArrayGenome<double> genome(genomeLength, objective);
+  genome.initializer(initializer);
+
+  // define own initializer, can do the same for mutator and comparator
+  // if (gp.variables.compare("g1g2g1_c") == 0) {
+  //   genome.initializer(::gammasInitializer);
+  // }
+  // else if (gp.variables.compare("wavepacket") == 0) {
+  //   genome.initializer(::wavepacketInitializer);
+  // }
+  // else {
+  //   std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
+  //     gp.variables << "not recognized." << std::endl;
+  //   exit(-1);
+  // }
 
   omp_set_num_threads(1);
   mkl_set_num_threads(1);
@@ -120,13 +130,14 @@ int main(int argc, char **argv)
   // Dump the GA results to file
   if(mpi_rank == 0)
   {
+    int pid = getpid();
     GA1DArrayGenome<double> &bestGenome = (GA1DArrayGenome<double> &)ga.population().best();
 
-    std::cout << "Best: Gene 0: " << bestGenome.score();
-    for (int ii = 0; ii < bestGenome.length(); ii++) {
+    std::cout << "[" << pid << ":" << mpi_rank << "] Best: Gene 0: " << bestGenome.gene(0);
+    for (int ii = 1; ii < bestGenome.length(); ii++) {
       std::cout << " Gene " << ii << ": " << bestGenome.gene(ii);
     }
-    std::cout << " Score: " << ga.population().best().score();
+    std::cout << " Score: " << bestGenome.score();
     std::cout << std::endl;
     }
 
