@@ -17,8 +17,6 @@ class GAParams : Params {
     double pMut = 0.2;
     double pCross = 0.6;
     double convergence = 0.01;
-
-    Params p;
 };
 
 #endif

@@ -24,6 +24,8 @@ void Initializer(GAGenome &);
 
 int mpi_tasks, mpi_rank;
 
+GAParams gp; // global variable, ugh
+
 int main(int argc, char **argv)
 {
   // MPI init
@@ -42,8 +44,9 @@ int main(int argc, char **argv)
   // Declare variables for the GA parameters and set them to some default values.
   int ngen     = 200; // Generations
 
-  GAParams gp;
-  assignGAParams("ins/ga.in", &gp);
+  if (mpi_rank == 0) {
+    assignGAParams("ins/ga.in", &gp);
+  }
 
   float (*objective)(GAGenome &) = NULL; // pointer to objective function
   if (gp.objectiveType.compare("single") == 0) {

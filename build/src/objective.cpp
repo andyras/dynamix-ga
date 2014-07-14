@@ -18,29 +18,27 @@ float singleObjective(GAGenome &c) {
 
   // Struct of parameters //////////////////////////////////////////////////////
 
-  GAParams gp;
-  assignGAParams("ins/ga.in", &gp);
-  Params * p = &(gp.p);
+  Params p;
   // TODO XXX FUGLINESS HARD-CODING
   std::string jobPrefix = "./";
-  p->inputFile = jobPrefix + "ins/parameters.in";
-  p->cEnergiesInput = jobPrefix + "ins/c_energies.in";
-  p->bEnergiesInput = jobPrefix + "ins/b_energies.in";
-  p->VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
-  p->VBridgeInput = jobPrefix + "ins/Vbridge.in";
+  p.inputFile = jobPrefix + "ins/parameters.in";
+  p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
+  p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
+  p.VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
+  p.VBridgeInput = jobPrefix + "ins/Vbridge.in";
 
   // assign parameters from input file /////////////////////////////////////////
 
-  assignParams(p->inputFile.c_str(), p);
+  assignParams(p.inputFile.c_str(), &p);
 
   // assign GA parameters
   // this function is independent of the objective you are using. It determines
   // what the relevant parameters are for the optimization.
   if (gp.variables.compare("g1g2g1_c") == 0) {
-    init_gammas(c, p);
+    init_gammas(c, &p);
   }
   else if (gp.variables.compare("wavepacket") == 0) {
-    init_wavepacket(c, p);
+    init_wavepacket(c, &p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
@@ -49,20 +47,20 @@ float singleObjective(GAGenome &c) {
   }
   print1DGenes(c);
 
-  initialize(p);
+  initialize(&p);
 
   // set number of processors for OpenMP ///////////////////////////////////////
 
-  omp_set_num_threads(p->nproc);
-  mkl_set_num_threads(p->nproc);
+  omp_set_num_threads(p.nproc);
+  mkl_set_num_threads(p.nproc);
 
   // Make plot files ///////////////////////////////////////////////////////////
 
-  makePlots(p);
+  makePlots(&p);
 
   // propagate /////////////////////////////////////////////////////////////////
 
-  propagate(p);
+  propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
 #ifdef DEBUG
@@ -70,16 +68,16 @@ float singleObjective(GAGenome &c) {
 #endif
   // set 'output' according to an objective function ///////////////////////////
   if (gp.objective.compare("acceptorPeak") == 0) {
-    output = objAcceptorPeak(p);
+    output = objAcceptorPeak(&p);
   }
   else if (gp.objective.compare("acceptorAvg") == 0) {
-    output = objAcceptorAvg(p);
+    output = objAcceptorAvg(&p);
   }
   else if (gp.objective.compare("acceptorAvgAfterPeak") == 0) {
-    output = objAcceptorAvgAfterPeak(p);
+    output = objAcceptorAvgAfterPeak(&p);
   }
   else if (gp.objective.compare("acceptorFinal") == 0) {
-    output = objAcceptorFinal(p);
+    output = objAcceptorFinal(&p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
@@ -111,33 +109,31 @@ float doubleObjective(GAGenome &c) {
 
   // Struct of parameters //////////////////////////////////////////////////////
 
-  GAParams gp;
-  assignGAParams("ins/ga.in", &gp);
-  Params * p = &(gp.p);
+  Params p;
 
   // TODO XXX FUGLINESS HARD-CODING
   std::string jobPrefix = "./";
-  p->inputFile = jobPrefix + "ins/parameters.in";
-  p->cEnergiesInput = jobPrefix + "ins/c_energies.in";
-  p->bEnergiesInput = jobPrefix + "ins/b_energies.in";
-  p->VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
-  p->VBridgeInput = jobPrefix + "ins/Vbridge.in";
+  p.inputFile = jobPrefix + "ins/parameters.in";
+  p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
+  p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
+  p.VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
+  p.VBridgeInput = jobPrefix + "ins/Vbridge.in";
 
   // coherent propagation //////////////////////////////////////////////////////
 
   // assign parameters from input file /////////////////////////////////////////
 
-  assignParams(p->inputFile.c_str(), p);
-  p->coherent = 1;
+  assignParams(p.inputFile.c_str(), &p);
+  p.coherent = 1;
 
   // assign GA parameters
   // this function is independent of the objective you are using. It determines
   // what the relevant parameters are for the optimization.
   if (gp.variables.compare("g1g2g1_c") == 0) {
-    init_gammas(c, p);
+    init_gammas(c, &p);
   }
   else if (gp.variables.compare("wavepacket") == 0) {
-    init_wavepacket(c, p);
+    init_wavepacket(c, &p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
@@ -145,22 +141,22 @@ float doubleObjective(GAGenome &c) {
     exit(-1);
   }
 
-  initialize(p);
+  initialize(&p);
 
   print1DGenes(c);
 
   // Make plot files ///////////////////////////////////////////////////////////
 
-  makePlots(p);
+  makePlots(&p);
 
   // set number of processors for OpenMP ///////////////////////////////////////
 
-  omp_set_num_threads(p->nproc);
-  mkl_set_num_threads(p->nproc);
+  omp_set_num_threads(p.nproc);
+  mkl_set_num_threads(p.nproc);
 
   // propagate /////////////////////////////////////////////////////////////////
 
-  propagate(p);
+  propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
 #ifdef DEBUG
@@ -168,16 +164,16 @@ float doubleObjective(GAGenome &c) {
 #endif
   // set 'output' according to an objective function ///////////////////////////
   if (gp.objective.compare("acceptorPeak") == 0) {
-    output1 = objAcceptorPeak(p);
+    output1 = objAcceptorPeak(&p);
   }
   else if (gp.objective.compare("acceptorAvg") == 0) {
-    output1 = objAcceptorAvg(p);
+    output1 = objAcceptorAvg(&p);
   }
   else if (gp.objective.compare("acceptorAvgAfterPeak") == 0) {
-    output1 = objAcceptorAvgAfterPeak(p);
+    output1 = objAcceptorAvgAfterPeak(&p);
   }
   else if (gp.objective.compare("acceptorFinal") == 0) {
-    output1 = objAcceptorFinal(p);
+    output1 = objAcceptorFinal(&p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
@@ -188,36 +184,35 @@ float doubleObjective(GAGenome &c) {
   std::cout << "[" << pid << ":" << rank << "] " << "Objective 1: " << output1 << std::endl;
 
   // incoherent propagation ////////////////////////////////////////////////////
-  assignParams(p->inputFile.c_str(), p);
-  p->coherent = 0;
+  p.coherent = 0;
   if (gp.variables.compare("g1g2g1_c") == 0) {
-    init_gammas(c, p);
+    init_gammas(c, &p);
   }
   else if (gp.variables.compare("wavepacket") == 0) {
-    init_wavepacket(c, p);
+    init_wavepacket(c, &p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
       gp.variables << "not recognized." << std::endl;
     exit(-1);
   }
-  initialize(p);
+  initialize(&p);
   print1DGenes(c);
-  propagate(p);
+  propagate(&p);
 #ifdef DEBUG
   std::cout << "Calculating value of objective function again..." << std::endl;
 #endif
   if (gp.objective.compare("acceptorPeak") == 0) {
-    output2 = objAcceptorPeak(p);
+    output2 = objAcceptorPeak(&p);
   }
   else if (gp.objective.compare("acceptorAvg") == 0) {
-    output2 = objAcceptorAvg(p);
+    output2 = objAcceptorAvg(&p);
   }
   else if (gp.objective.compare("acceptorAvgAfterPeak") == 0) {
-    output2 = objAcceptorAvgAfterPeak(p);
+    output2 = objAcceptorAvgAfterPeak(&p);
   }
   else if (gp.objective.compare("acceptorFinal") == 0) {
-    output2 = objAcceptorFinal(p);
+    output2 = objAcceptorFinal(&p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
