@@ -44,9 +44,7 @@ int main(int argc, char **argv)
   // Declare variables for the GA parameters and set them to some default values.
   int ngen     = 200; // Generations
 
-  if (mpi_rank == 0) {
-    assignGAParams("ins/ga.in", &gp);
-  }
+  assignGAParams("ins/ga.in", &gp);
 
   float (*objective)(GAGenome &) = NULL; // pointer to objective function
   if (gp.objectiveType.compare("single") == 0) {
