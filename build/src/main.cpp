@@ -78,9 +78,6 @@ int main(int argc, char **argv)
   GA1DArrayGenome<double> genome(genomeLength, objective);
   genome.initializer(initializer);
 
-  omp_set_num_threads(1);
-  mkl_set_num_threads(1);
-
   // Now create the GA using the genome and run it. We'll use sigma truncation
   // scaling so that we can handle negative objective scores.
   GASimpleGA ga(genome); // TODO change to steady-state
@@ -114,9 +111,6 @@ int main(int argc, char **argv)
   ga.mpi_rank(mpi_rank);
   ga.mpi_tasks(mpi_tasks);
   ga.evolve(seed);
-
-  omp_set_num_threads(1);
-  mkl_set_num_threads(1);
 
   // Dump the GA results to file
   if(mpi_rank == 0)
