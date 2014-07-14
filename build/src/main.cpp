@@ -40,17 +40,10 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 36; // Population
   int ngen     = 200; // Generations
-  float pmut   = 0.25;
-  float pcross = 0.65;
-  float pconv = 1.01; // convergence
 
   GAParams gp;
   assignGAParams("ins/ga.in", &gp);
-
-  // popsize / mpi_tasks must be an integer
-  popsize = mpi_tasks * int((double)popsize/(double)mpi_tasks+0.999);
 
   float (*objective)(GAGenome &) = NULL; // pointer to objective function
   if (gp.objectiveType.compare("single") == 0) {
@@ -84,19 +77,6 @@ int main(int argc, char **argv)
   GA1DArrayGenome<double> genome(genomeLength, objective);
   genome.initializer(initializer);
 
-  // define own initializer, can do the same for mutator and comparator
-  // if (gp.variables.compare("g1g2g1_c") == 0) {
-  //   genome.initializer(::gammasInitializer);
-  // }
-  // else if (gp.variables.compare("wavepacket") == 0) {
-  //   genome.initializer(::wavepacketInitializer);
-  // }
-  // else {
-  //   std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-  //     gp.variables << "not recognized." << std::endl;
-  //   exit(-1);
-  // }
-
   omp_set_num_threads(1);
   mkl_set_num_threads(1);
 
@@ -104,12 +84,22 @@ int main(int argc, char **argv)
   // scaling so that we can handle negative objective scores.
   GASimpleGA ga(genome); // TODO change to steady-state
   GALinearScaling scaling;
-  ga.minimize();    // by default we want to minimize the objective
-  ga.populationSize(popsize);
+  if (gp.minmax.compare("min") == 0) {
+    ga.minimize();
+    ga.pConvergence(1.0 + gp.convergence);
+  }
+  else if (gp.minmax.compare("max") == 0) {
+    ga.maximize();
+    ga.pConvergence(1.0 - gp.convergence);
+  }
+  else {
+    std::cerr << "ERROR: unrecognized minmax: << " << gp.minmax << std::endl;
+    exit(0);
+  }
+  ga.populationSize(gp.popsize);
   ga.nGenerations(ngen);
-  ga.pMutation(pmut);
-  ga.pCrossover(pcross);
-  ga.pConvergence(pconv);
+  ga.pMutation(gp.pMut);
+  ga.pCrossover(gp.pCross);
   ga.terminator(GAGeneticAlgorithm::TerminateUponConvergence);
   ga.scaling(scaling);
   if(mpi_rank == 0)

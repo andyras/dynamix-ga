@@ -4,6 +4,10 @@ objective=acceptorPeak
 doubleObjective=coherence
 variables=wavepacket
 minmax=min
+popsize=36
+pMut=0.2
+pCross=0.6
+convergence=0.01
 ## END INPUT PARAMETERS ##
 
 [[Output Files]]

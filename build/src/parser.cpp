@@ -45,31 +45,39 @@ void assignGAParams(std::string inputFile, GAParams * p) {
     // parameter is after equals sign, before space
     param_val = line.substr(int(equals_pos)+1,int(space_pos)-int(equals_pos));
     // extract parameters
-#ifdef DEBUG
-    std::cout << "Parameter: " << input_param << std::endl << "New value: " << param_val << std::endl;
-#endif
     if (input_param == "objectiveType") { p->objectiveType = param_val; }
     else if (input_param == "objective") { p->objective = param_val; }
     else if (input_param == "doubleObjective") { p->doubleObjective = param_val; }
     else if (input_param == "variables") { p->variables = param_val; }
     else if (input_param == "minmax") { p->minmax = param_val; }
-    else {  }
+    else if (input_param == "popsize") { p->popsize = stoi(param_val); }
+    else if (input_param == "pMut") { p->pMut = stod(param_val); }
+    else if (input_param == "pCross") { p->pCross = stod(param_val); }
+    else if (input_param == "convergence") { p->convergence = stod(param_val); }
+    else {
+      std::cerr << "WARNING: unknown input parameter " << input_param << std::endl;
+    }
+#ifdef DEBUG
+    std::cout << "Parameter: " << input_param << std::endl << "New value: " << param_val << std::endl;
+#endif
     getline (bash_in,line);
   }
 
   // close input file
   bash_in.close();
 
-#ifdef DEBUG
-  std::cout << std::endl;
-  std::cout << "objectiveType is " << p->objectiveType << std::endl;
-  std::cout << "objective is " << p->objective << std::endl;
-  std::cout << "doubleObjective is " << p->doubleObjective << std::endl;
-  std::cout << "variables is " << p->variables << std::endl;
-  std::cout << "minmax is " << p->minmax << std::endl;
-#endif
-
   // Error checking
+
+  // popsize / mpi_tasks must be an integer
+  int mpi_tasks = 0;
+  MPI_Comm_size(MPI_COMM_WORLD, &mpi_tasks);
+  int newPopSize = mpi_tasks * int((double)p->popsize/(double)mpi_tasks+0.99999);
+  if (p->popsize % mpi_tasks != 0) {
+    std::cerr << "WARNING: MPI task number (" << mpi_tasks <<
+      ") does not divide evenly into population size (" << p->popsize <<
+      "). Setting population size to " << newPopSize << std::endl;
+    p->popsize = newPopSize;
+  }
 
   return;
 }
