@@ -40,7 +40,7 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 4; // Population
+  int popsize  = 36; // Population
   int ngen     = 200; // Generations
   float pmut   = 0.25;
   float pcross = 0.65;
@@ -54,10 +54,10 @@ int main(int argc, char **argv)
 
   float (*objective)(GAGenome &) = NULL; // pointer to objective function
   if (gp.objectiveType.compare("single") == 0) {
-    objective = dynamixObjective;
+    objective = singleObjective;
   }
   else if (gp.objectiveType.compare("double") == 0) {
-    objective = dualObjective;
+    objective = doubleObjective;
   }
   else {
     std::cout << "WARNING [" << __FUNCTION__ << "]: " << "objective type" <<

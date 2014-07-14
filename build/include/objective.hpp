@@ -15,9 +15,9 @@
 #include "params.hpp"
 #include "parser.hpp"
 
-float dynamixObjective(GAGenome &);
+float singleObjective(GAGenome &);
 
-float dualObjective(GAGenome &);
+float doubleObjective(GAGenome &);
 
 double objAcceptorPeak(Params * p);
 

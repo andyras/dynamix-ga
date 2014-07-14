@@ -2,7 +2,7 @@
 
 // #define DEBUG
 
-float dynamixObjective(GAGenome &c) {
+float singleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
   // get MPI rank and size
   int rank, size;
@@ -94,7 +94,7 @@ float dynamixObjective(GAGenome &c) {
   return output;
 }
 
-float dualObjective(GAGenome &c) {
+float doubleObjective(GAGenome &c) {
   int pid = getpid();
   // get MPI rank and size
   int rank, size;
