@@ -4,14 +4,14 @@
 
 float singleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
+  GAParams * gp = (GAParams *) genome.userData();
+
   // get MPI rank and size
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-#ifdef DEBUG
-  std::cout << "rank: " << rank << " of " << size << "\n";
-#endif
+  int pid = getpid();
 
   // output value
   float output = 1.0;
@@ -34,15 +34,15 @@ float singleObjective(GAGenome &c) {
   // assign GA parameters
   // this function is independent of the objective you are using. It determines
   // what the relevant parameters are for the optimization.
-  if (gp.initializer.compare("g1g2g1_c") == 0) {
+  if (gp->initializer.compare("g1g2g1_c") == 0) {
     init_gammas(c, &p);
   }
-  else if (gp.initializer.compare("wavepacket") == 0) {
+  else if (gp->initializer.compare("wavepacket") == 0) {
     init_wavepacket(c, &p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp.initializer << "not recognized." << std::endl;
+      gp->initializer << "not recognized." << std::endl;
     exit(-1);
   }
 
@@ -63,28 +63,28 @@ float singleObjective(GAGenome &c) {
 
   // calculate value of objective function /////////////////////////////////////
 #ifdef DEBUG
-  std::cout << "Calculating value of objective function..." << std::endl;
+  std::cout << "[" << pid << ":" << rank << "] " <<
+    "Calculating value of objective function..." << std::endl;
 #endif
   // set 'output' according to an objective function ///////////////////////////
-  if (gp.objective.compare("acceptorPeak") == 0) {
+  if (gp->objective.compare("acceptorPeak") == 0) {
     output = objAcceptorPeak(&p);
   }
-  else if (gp.objective.compare("acceptorAvg") == 0) {
+  else if (gp->objective.compare("acceptorAvg") == 0) {
     output = objAcceptorAvg(&p);
   }
-  else if (gp.objective.compare("acceptorAvgAfterPeak") == 0) {
+  else if (gp->objective.compare("acceptorAvgAfterPeak") == 0) {
     output = objAcceptorAvgAfterPeak(&p);
   }
-  else if (gp.objective.compare("acceptorFinal") == 0) {
+  else if (gp->objective.compare("acceptorFinal") == 0) {
     output = objAcceptorFinal(&p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
-      gp.objective << "not recognized." << std::endl;
+      gp->objective << "not recognized." << std::endl;
     exit(-1);
   }
 
-  int pid = getpid();
   std::cout << "[" << pid << ":" << rank << "] " << "Objective: " << output << " Genome:";
   for (unsigned int ii = 0; ii < (unsigned int) genome.length(); ii++) {
     std::cout << " " << genome.gene(ii);
@@ -92,8 +92,8 @@ float singleObjective(GAGenome &c) {
   std::cout << std::endl;
 
   // initialize best genome if this is the first call to the objective function
-  if (gp.firstEval && (rank == 0)) {
-    gp.firstEval = false;
+  if (gp->firstEval && (rank == 0)) {
+    gp->firstEval = false;
 #ifdef DEBUG
     std::cout << "[" << pid << ":" << rank << "] " << "first call to objective" << std::endl;
 #endif
@@ -106,20 +106,20 @@ float singleObjective(GAGenome &c) {
 
   // update best genome if this call is the best ///////////////////////////////
   bool isBest = false;
-  if (((gp.minmax.compare("min") == 0) && (output < gp.bestScore)) ||
-       ((gp.minmax.compare("max") == 0) && (output > gp.bestScore))) {
+  if (((gp->minmax.compare("min") == 0) && (output < gp->bestScore)) ||
+       ((gp->minmax.compare("max") == 0) && (output > gp->bestScore))) {
       isBest = true;
   }
 
   if (isBest) {
-    gp.bestScore = output;
-    for (unsigned int ii = 0; ii < gp.bestGenome.size(); ii++) {
-      gp.bestGenome[ii] = genome.gene(ii);
+    gp->bestScore = output;
+    for (unsigned int ii = 0; ii < gp->bestGenome.size(); ii++) {
+      gp->bestGenome[ii] = genome.gene(ii);
     }
 #ifdef DEBUG
     std::cout << "[" << pid << ":" << rank << "] " << "New best score: " << output << " Genome:";
-    for (unsigned int ii = 0; ii < gp.bestGenome.size(); ii++) {
-      std::cout << " " << gp.bestGenome[ii];
+    for (unsigned int ii = 0; ii < gp->bestGenome.size(); ii++) {
+      std::cout << " " << gp->bestGenome[ii];
     }
     std::cout << std::endl;
 #endif
@@ -135,6 +135,7 @@ float singleObjective(GAGenome &c) {
 
 float doubleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
+  GAParams * gp = (GAParams *) genome.userData();
 
   int pid = getpid();
   // get MPI rank and size
@@ -172,15 +173,15 @@ float doubleObjective(GAGenome &c) {
   // assign GA parameters
   // this function is independent of the objective you are using. It determines
   // what the relevant parameters are for the optimization.
-  if (gp.initializer.compare("g1g2g1_c") == 0) {
+  if (gp->initializer.compare("g1g2g1_c") == 0) {
     init_gammas(c, &p);
   }
-  else if (gp.initializer.compare("wavepacket") == 0) {
+  else if (gp->initializer.compare("wavepacket") == 0) {
     init_wavepacket(c, &p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp.initializer << "not recognized." << std::endl;
+      gp->initializer << "not recognized." << std::endl;
     exit(-1);
   }
 
@@ -205,21 +206,21 @@ float doubleObjective(GAGenome &c) {
     "Calculating value of objective function..." << std::endl;
 #endif
   // set 'output' according to an objective function ///////////////////////////
-  if (gp.objective.compare("acceptorPeak") == 0) {
+  if (gp->objective.compare("acceptorPeak") == 0) {
     output1 = objAcceptorPeak(&p);
   }
-  else if (gp.objective.compare("acceptorAvg") == 0) {
+  else if (gp->objective.compare("acceptorAvg") == 0) {
     output1 = objAcceptorAvg(&p);
   }
-  else if (gp.objective.compare("acceptorAvgAfterPeak") == 0) {
+  else if (gp->objective.compare("acceptorAvgAfterPeak") == 0) {
     output1 = objAcceptorAvgAfterPeak(&p);
   }
-  else if (gp.objective.compare("acceptorFinal") == 0) {
+  else if (gp->objective.compare("acceptorFinal") == 0) {
     output1 = objAcceptorFinal(&p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
-      gp.objective << "not recognized." << std::endl;
+      gp->objective << "not recognized." << std::endl;
     exit(-1);
   }
 
@@ -231,15 +232,15 @@ float doubleObjective(GAGenome &c) {
 
   // incoherent propagation ////////////////////////////////////////////////////
   p.coherent = 0;
-  if (gp.initializer.compare("g1g2g1_c") == 0) {
+  if (gp->initializer.compare("g1g2g1_c") == 0) {
     init_gammas(c, &p);
   }
-  else if (gp.initializer.compare("wavepacket") == 0) {
+  else if (gp->initializer.compare("wavepacket") == 0) {
     init_wavepacket(c, &p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp.initializer << "not recognized." << std::endl;
+      gp->initializer << "not recognized." << std::endl;
     exit(-1);
   }
   initialize(&p);
@@ -248,21 +249,21 @@ float doubleObjective(GAGenome &c) {
   std::cout << "[" << pid << ":" << rank << "] " <<
     "Calculating value of objective function again..." << std::endl;
 #endif
-  if (gp.objective.compare("acceptorPeak") == 0) {
+  if (gp->objective.compare("acceptorPeak") == 0) {
     output2 = objAcceptorPeak(&p);
   }
-  else if (gp.objective.compare("acceptorAvg") == 0) {
+  else if (gp->objective.compare("acceptorAvg") == 0) {
     output2 = objAcceptorAvg(&p);
   }
-  else if (gp.objective.compare("acceptorAvgAfterPeak") == 0) {
+  else if (gp->objective.compare("acceptorAvgAfterPeak") == 0) {
     output2 = objAcceptorAvgAfterPeak(&p);
   }
-  else if (gp.objective.compare("acceptorFinal") == 0) {
+  else if (gp->objective.compare("acceptorFinal") == 0) {
     output2 = objAcceptorFinal(&p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
-      gp.objective << "not recognized." << std::endl;
+      gp->objective << "not recognized." << std::endl;
     exit(-1);
   }
 
@@ -277,20 +278,20 @@ float doubleObjective(GAGenome &c) {
 
   // update best genome if this call is the best ///////////////////////////////
   bool isBest = false;
-  if (((gp.minmax.compare("min") == 0) && (output < gp.bestScore)) ||
-       ((gp.minmax.compare("max") == 0) && (output > gp.bestScore))) {
+  if (((gp->minmax.compare("min") == 0) && (output < gp->bestScore)) ||
+       ((gp->minmax.compare("max") == 0) && (output > gp->bestScore))) {
       isBest = true;
   }
 
   if (isBest) {
-    gp.bestScore = output;
-    for (unsigned int ii = 0; ii < gp.bestGenome.size(); ii++) {
-      gp.bestGenome[ii] = genome.gene(ii);
+    gp->bestScore = output;
+    for (unsigned int ii = 0; ii < gp->bestGenome.size(); ii++) {
+      gp->bestGenome[ii] = genome.gene(ii);
     }
 #ifdef DEBUG
     std::cout << "[" << pid << ":" << rank << "] " << "New best score: " << output << " Genome:";
-    for (unsigned int ii = 0; ii < gp.bestGenome.size(); ii++) {
-      std::cout << " " << gp.bestGenome[ii];
+    for (unsigned int ii = 0; ii < gp->bestGenome.size(); ii++) {
+      std::cout << " " << gp->bestGenome[ii];
     }
     std::cout << std::endl;
 #endif

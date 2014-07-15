@@ -15,8 +15,6 @@
 #include "params.hpp"
 #include "parser.hpp"
 
-extern GAParams gp; // global variable, ugh
-
 float singleObjective(GAGenome &);
 
 float doubleObjective(GAGenome &);

@@ -21,14 +21,14 @@
 
 int mpi_tasks, mpi_rank;
 
-GAParams gp; // global variable, ugh
-
 int main(int argc, char **argv)
 {
   // MPI init
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &mpi_tasks);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
+  int pid = getpid();
 
   // See if we've been given a seed to use (for testing purposes).  When you
   // specify a random seed, the evolution will be exactly the same each time
@@ -41,10 +41,17 @@ int main(int argc, char **argv)
   // Declare variables for the GA parameters and set them to some default values.
   int ngen = 200; // Generations
 
+  GAParams gp;
+
   assignGAParams("ins/ga.in", &gp);
 
+  void * userData = &gp;
 #ifdef DEBUG
-  std::cout << "Using " << gp.objectiveType << " objective function." << std::endl;
+  std::cout << "[" << pid << ":" << mpi_rank <<  "] userData is " << userData << std::endl;
+#endif
+
+#ifdef DEBUG
+  std::cout << "[" << pid << ":" << mpi_rank <<  "] Using " << gp.objectiveType << " objective function." << std::endl;
 #endif
   if (gp.objectiveType.compare("single") == 0) {
     gp.objectiveFn = singleObjective;
@@ -73,7 +80,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  GA1DArrayGenome<double> genome(genomeLength, gp.objectiveFn);
+  GA1DArrayGenome<double> genome(genomeLength, gp.objectiveFn, userData);
   genome.initializer(gp.initializerFn);
 
   // initialize structures for best genomes/scores
@@ -87,10 +94,10 @@ int main(int argc, char **argv)
 
   gp.bestScore = initVal;
   gp.bestGenome.resize(genomeLength);
-
   // Now create the GA using the genome and run it. We'll use sigma truncation
   // scaling so that we can handle negative objective scores.
   GASimpleGA ga(genome); // TODO change to steady-state
+  ga.userData(userData);
   GALinearScaling scaling;
   if (gp.minmax.compare("min") == 0) {
     ga.minimize();
@@ -146,8 +153,6 @@ int main(int argc, char **argv)
   // Dump the GA results to file ///////////////////////////////////////////////
   if(mpi_rank == 0)
   {
-    int pid = getpid();
-
     // find rank of best score
     auto bestScore = std::min_element(bestScores.begin(), bestScores.end());
     if (gp.minmax.compare("max") == 0) {
