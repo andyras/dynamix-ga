@@ -19,9 +19,6 @@
 
 // #define DEBUG
 
-// declare Initializer also
-void Initializer(GAGenome &);
-
 int mpi_tasks, mpi_rank;
 
 GAParams gp; // global variable, ugh
@@ -42,16 +39,18 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int ngen     = 200; // Generations
+  int ngen = 200; // Generations
 
   assignGAParams("ins/ga.in", &gp);
 
-  float (*objective)(GAGenome &) = NULL; // pointer to objective function
+#ifdef DEBUG
+  std::cout << "Using " << gp.objectiveType << " objective function." << std::endl;
+#endif
   if (gp.objectiveType.compare("single") == 0) {
-    objective = singleObjective;
+    gp.objectiveFn = singleObjective;
   }
   else if (gp.objectiveType.compare("double") == 0) {
-    objective = doubleObjective;
+    gp.objectiveFn = doubleObjective;
   }
   else {
     std::cout << "WARNING [" << __FUNCTION__ << "]: " << "objective type" <<
@@ -59,24 +58,35 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  void (*initializer)(GAGenome &) = NULL; // pointer to initializer function
-  int genomeLength = 0;
-  if (gp.variables.compare("g1g2g1_c") == 0) {
-    initializer = ::gammasInitializer;
+  unsigned int genomeLength = 0;
+  if (gp.initializer.compare("g1g2g1_c") == 0) {
+    gp.initializerFn = ::gammasInitializer;
     genomeLength = 3;
   }
-  else if (gp.variables.compare("wavepacket") == 0) {
-    initializer = ::wavepacketInitializer;
+  else if (gp.initializer.compare("wavepacket") == 0) {
+    gp.initializerFn = ::wavepacketInitializer;
     genomeLength = 2;
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp.variables << "not recognized." << std::endl;
+      gp.initializer << "not recognized." << std::endl;
     exit(-1);
   }
 
-  GA1DArrayGenome<double> genome(genomeLength, objective);
-  genome.initializer(initializer);
+  GA1DArrayGenome<double> genome(genomeLength, gp.objectiveFn);
+  genome.initializer(gp.initializerFn);
+
+  // initialize structures for best genomes/scores
+  double initVal = 0.0;
+  if (gp.minmax.compare("min") == 0) {
+    initVal = INFINITY;
+  }
+  else if (gp.minmax.compare("max") == 0) {
+    initVal = -INFINITY;
+  }
+
+  gp.bestScore = initVal;
+  gp.bestGenome.resize(genomeLength);
 
   // Now create the GA using the genome and run it. We'll use sigma truncation
   // scaling so that we can handle negative objective scores.
@@ -112,19 +122,52 @@ int main(int argc, char **argv)
   ga.mpi_tasks(mpi_tasks);
   ga.evolve(seed);
 
-  // Dump the GA results to file
+  std::vector<double> bestScores;
+  std::vector<double> bestGenomes;
+
+  if (mpi_rank == 0) {
+    bestScores.resize(mpi_tasks, 0.0);
+    bestGenomes.resize(mpi_tasks*genomeLength, 0.0);
+  }
+
+  // wait for everyone to finish ///////////////////////////////////////////////
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  // gather best scores ////////////////////////////////////////////////////////
+  MPI_Gather(&gp.bestScore, 1, MPI_DOUBLE,
+             &(bestScores[0]), 1, MPI_DOUBLE,
+             0, MPI_COMM_WORLD);
+
+  // gather best genomes ///////////////////////////////////////////////////////
+  MPI_Gather(&(gp.bestGenome[0]), genomeLength, MPI_DOUBLE,
+             &(bestGenomes[0]), genomeLength, MPI_DOUBLE,
+             0, MPI_COMM_WORLD);
+
+  // Dump the GA results to file ///////////////////////////////////////////////
   if(mpi_rank == 0)
   {
     int pid = getpid();
-    GA1DArrayGenome<double> &bestGenome = (GA1DArrayGenome<double> &)ga.population().best();
 
-    std::cout << "[" << pid << ":" << mpi_rank << "] Best: Gene 0: " << bestGenome.gene(0);
-    for (int ii = 1; ii < bestGenome.length(); ii++) {
-      std::cout << " Gene " << ii << ": " << bestGenome.gene(ii);
+    // find rank of best score
+    auto bestScore = std::min_element(bestScores.begin(), bestScores.end());
+    if (gp.minmax.compare("max") == 0) {
+      bestScore = std::max_element(bestScores.begin(), bestScores.end());
     }
-    std::cout << " Score: " << bestGenome.score();
+    unsigned int bestIdx = std::distance(bestScores.begin(), bestScore);
+
+    std::cout << "[" << pid << ":" << mpi_rank << "] Best score: " <<
+      bestScores[bestIdx] << " Genome:";
+    for (unsigned int ii = 0; ii < genomeLength; ii++) {
+      std::cout << " " << bestGenomes[bestIdx*genomeLength + ii];
+    }
     std::cout << std::endl;
+
+    std::cout << "[" << pid << ":" << mpi_rank << "] Scores:";
+    for (unsigned int ii = 0; ii < bestScores.size(); ii++) {
+      std::cout << " " << bestScores[ii];
     }
+    std::cout << std::endl;
+  }
 
   MPI_Finalize();
 
