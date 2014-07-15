@@ -232,17 +232,6 @@ float doubleObjective(GAGenome &c) {
 
   // incoherent propagation ////////////////////////////////////////////////////
   p.coherent = 0;
-  if (gp->initializer.compare("g1g2g1_c") == 0) {
-    init_gammas(c, &p);
-  }
-  else if (gp->initializer.compare("wavepacket") == 0) {
-    init_wavepacket(c, &p);
-  }
-  else {
-    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp->initializer << "not recognized." << std::endl;
-    exit(-1);
-  }
   initialize(&p);
   propagate(&p);
 #ifdef DEBUG
