@@ -45,7 +45,6 @@ float singleObjective(GAGenome &c) {
       gp.initializer << "not recognized." << std::endl;
     exit(-1);
   }
-  print1DGenes(c);
 
   initialize(&p);
 
@@ -86,7 +85,11 @@ float singleObjective(GAGenome &c) {
   }
 
   int pid = getpid();
-  std::cout << "[" << pid << ":" << rank << "] " << "Objective: " << output << std::endl;
+  std::cout << "[" << pid << ":" << rank << "] " << "Objective: " << output << " Genome:";
+  for (unsigned int ii = 0; ii < (unsigned int) genome.length(); ii++) {
+    std::cout << " " << genome.gene(ii);
+  }
+  std::cout << std::endl;
 
   // initialize best genome if this is the first call to the objective function
   if (gp.firstEval && (rank == 0)) {
@@ -121,9 +124,11 @@ float singleObjective(GAGenome &c) {
     std::cout << std::endl;
 #endif
   }
+#ifdef DEBUG
   else {
     std::cout << "[" << pid << ":" << rank << "] " << "Not best score." << std::endl;
   }
+#endif
 
   return output;
 }
@@ -181,8 +186,6 @@ float doubleObjective(GAGenome &c) {
 
   initialize(&p);
 
-  print1DGenes(c);
-
   // Make plot files ///////////////////////////////////////////////////////////
 
   makePlots(&p);
@@ -220,7 +223,11 @@ float doubleObjective(GAGenome &c) {
     exit(-1);
   }
 
-  std::cout << "[" << pid << ":" << rank << "] " << "Objective 1: " << output1 << std::endl;
+  std::cout << "[" << pid << ":" << rank << "] " << "Objective 1: " << output1 << " Genome:";
+  for (unsigned int ii = 0; ii < (unsigned int) genome.length(); ii++) {
+    std::cout << " " << genome.gene(ii);
+  }
+  std::cout << std::endl;
 
   // incoherent propagation ////////////////////////////////////////////////////
   p.coherent = 0;
@@ -236,7 +243,6 @@ float doubleObjective(GAGenome &c) {
     exit(-1);
   }
   initialize(&p);
-  print1DGenes(c);
   propagate(&p);
 #ifdef DEBUG
   std::cout << "[" << pid << ":" << rank << "] " <<
@@ -259,7 +265,12 @@ float doubleObjective(GAGenome &c) {
       gp.objective << "not recognized." << std::endl;
     exit(-1);
   }
-  std::cout << "[" << pid << ":" << rank << "] " << "Objective 2: " << output2 << std::endl;
+
+  std::cout << "[" << pid << ":" << rank << "] " << "Objective 2: " << output2 << " Genome:";
+  for (unsigned int ii = 0; ii < (unsigned int) genome.length(); ii++) {
+    std::cout << " " << genome.gene(ii);
+  }
+  std::cout << std::endl;
 
   double output = fabs(output1 - output2);
   std::cout << "[" << pid << ":" << rank << "] " << "Combined objective: " << output << std::endl;
@@ -284,9 +295,11 @@ float doubleObjective(GAGenome &c) {
     std::cout << std::endl;
 #endif
   }
+#ifdef DEBUG
   else {
     std::cout << "[" << pid << ":" << rank << "] " << "Not best score." << std::endl;
   }
+#endif
 
   return output;
 }
