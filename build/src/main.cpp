@@ -10,20 +10,14 @@
 #include <string>
 
 #include <dynamix.hpp>
-#include <propagate.hpp>
 
 #include "objective.hpp"
 #include "initializer.hpp"
+#include "output.hpp"
+#include "parser.hpp"
+#include "gaparams.hpp"
 
-#define DEBUG
-
-// This are the declaration of the objective functions which are defined later.
-float objective(GAGenome &);
-float dynamixObjective(GAGenome &);
-int dynamixMain (int argc, char * argv[]);
-
-// declare Initializer also
-void Initializer(GAGenome &);
+// #define DEBUG
 
 int mpi_tasks, mpi_rank;
 
@@ -34,6 +28,8 @@ int main(int argc, char **argv)
   MPI_Comm_size(MPI_COMM_WORLD, &mpi_tasks);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
+  int pid = getpid();
+
   // See if we've been given a seed to use (for testing purposes).  When you
   // specify a random seed, the evolution will be exactly the same each time
   // you use that seed number
@@ -43,41 +39,83 @@ int main(int argc, char **argv)
       seed = atoi(argv[i]);
 
   // Declare variables for the GA parameters and set them to some default values.
-  int popsize  = 24; // Population
-  int ngen     = 200; // Generations
-  float pmut   = 0.05;
-  float pcross = 0.65;
+  int ngen = 200; // Generations
 
-  // popsize / mpi_tasks must be an integer
-  popsize = mpi_tasks * int((double)popsize/(double)mpi_tasks+0.999);
+  GAParams gp;
 
-  // Create the phenotype for two variables.  The number of bits you can use to
-  // represent any number is limited by the type of computer you are using.
-  // For this case we use 10 bits for each var, ranging the square domain [0,5*PI]x[0,5*PI]
-  ///GABin2DecPhenotype map;
-  ///GABin2DecPhenotype map;
-  ///map.add(10, 0.0, 5.0 * M_PI);
-  ///map.add(10, 0.0, 5.0 * M_PI);
+  assignGAParams("ins/ga.in", &gp);
 
-  // Create the template genome using the phenotype map we just made.
-  ///GABin2DecGenome genome(map, objective);
-  //GA1DArrayGenome<double> genome(2, objective);
-  GA1DArrayGenome<double> genome(3, dynamixObjective);
-  // define own initializer, can do the same for mutator and comparator
-  genome.initializer(::Initializer);
+  void * userData = &gp;
+#ifdef DEBUG
+  std::cout << "[" << pid << ":" << mpi_rank <<  "] userData is " << userData << std::endl;
+#endif
 
-  omp_set_num_threads(2);
-  mkl_set_num_threads(2);
+#ifdef DEBUG
+  std::cout << "[" << pid << ":" << mpi_rank <<  "] Using " << gp.objectiveType << " objective function." << std::endl;
+#endif
+  if (gp.objectiveType.compare("single") == 0) {
+    gp.objectiveFn = singleObjective;
+  }
+  else if (gp.objectiveType.compare("double") == 0) {
+    gp.objectiveFn = doubleObjective;
+  }
+  else {
+    std::cout << "WARNING [" << __FUNCTION__ << "]: " << "objective type" <<
+      gp.objectiveType << "not recognized." << std::endl;
+    exit(-1);
+  }
 
+  unsigned int genomeLength = 0;
+  if (gp.initializer.compare("g1g2g1_c") == 0) {
+    gp.initializerFn = ::gammasInitializer;
+    genomeLength = 3;
+  }
+  else if (gp.initializer.compare("wavepacket") == 0) {
+    gp.initializerFn = ::wavepacketInitializer;
+    genomeLength = 2;
+  }
+  else {
+    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
+      gp.initializer << "not recognized." << std::endl;
+    exit(-1);
+  }
+
+  GA1DArrayGenome<double> genome(genomeLength, gp.objectiveFn, userData);
+  genome.initializer(gp.initializerFn);
+
+  // initialize structures for best genomes/scores
+  double initVal = 0.0;
+  if (gp.minmax.compare("min") == 0) {
+    initVal = INFINITY;
+  }
+  else if (gp.minmax.compare("max") == 0) {
+    initVal = -INFINITY;
+  }
+
+  gp.bestScore = initVal;
+  gp.bestGenome.resize(genomeLength);
   // Now create the GA using the genome and run it. We'll use sigma truncation
   // scaling so that we can handle negative objective scores.
   GASimpleGA ga(genome); // TODO change to steady-state
+  ga.userData(userData);
   GALinearScaling scaling;
-  ga.minimize();    // by default we want to minimize the objective
-  ga.populationSize(popsize);
+  if (gp.minmax.compare("min") == 0) {
+    ga.minimize();
+    ga.pConvergence(1.0 + gp.convergence);
+  }
+  else if (gp.minmax.compare("max") == 0) {
+    ga.maximize();
+    ga.pConvergence(1.0 - gp.convergence);
+  }
+  else {
+    std::cerr << "ERROR: unrecognized minmax: << " << gp.minmax << std::endl;
+    exit(0);
+  }
+  ga.populationSize(gp.popsize);
   ga.nGenerations(ngen);
-  ga.pMutation(pmut);
-  ga.pCrossover(pcross);
+  ga.pMutation(gp.pMut);
+  ga.pCrossover(gp.pCross);
+  ga.terminator(GAGeneticAlgorithm::TerminateUponConvergence);
   ga.scaling(scaling);
   if(mpi_rank == 0)
     ga.scoreFilename("evolution.txt");
@@ -91,90 +129,52 @@ int main(int argc, char **argv)
   ga.mpi_tasks(mpi_tasks);
   ga.evolve(seed);
 
-  omp_set_num_threads(1);
-  mkl_set_num_threads(1);
+  std::vector<double> bestScores;
+  std::vector<double> bestGenomes;
 
-  // Dump the GA results to file
+  if (mpi_rank == 0) {
+    bestScores.resize(mpi_tasks, 0.0);
+    bestGenomes.resize(mpi_tasks*genomeLength, 0.0);
+  }
+
+  // wait for everyone to finish ///////////////////////////////////////////////
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  // gather best scores ////////////////////////////////////////////////////////
+  MPI_Gather(&gp.bestScore, 1, MPI_DOUBLE,
+             &(bestScores[0]), 1, MPI_DOUBLE,
+             0, MPI_COMM_WORLD);
+
+  // gather best genomes ///////////////////////////////////////////////////////
+  MPI_Gather(&(gp.bestGenome[0]), genomeLength, MPI_DOUBLE,
+             &(bestGenomes[0]), genomeLength, MPI_DOUBLE,
+             0, MPI_COMM_WORLD);
+
+  // Dump the GA results to file ///////////////////////////////////////////////
   if(mpi_rank == 0)
   {
-    genome = ga.statistics().bestIndividual();
-    printf("GA result:\n");
-    printf("x = %f, y = %f\n",
-  genome.gene(0), genome.gene(1));
+    // find rank of best score
+    auto bestScore = std::min_element(bestScores.begin(), bestScores.end());
+    if (gp.minmax.compare("max") == 0) {
+      bestScore = std::max_element(bestScores.begin(), bestScores.end());
+    }
+    unsigned int bestIdx = std::distance(bestScores.begin(), bestScore);
+
+    std::cout << "[" << pid << ":" << mpi_rank << "] Best score: " <<
+      bestScores[bestIdx] << " Genome:";
+    for (unsigned int ii = 0; ii < genomeLength; ii++) {
+      std::cout << " " << bestGenomes[bestIdx*genomeLength + ii];
+    }
+    std::cout << std::endl;
+
+    std::cout << "[" << pid << ":" << mpi_rank << "] Scores:";
+    for (unsigned int ii = 0; ii < bestScores.size(); ii++) {
+      std::cout << " " << bestScores[ii];
+    }
+    std::cout << std::endl;
   }
 
   MPI_Finalize();
 
   return 0;
-}
-
-float dynamixObjective(GAGenome &c) {
-  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
-  // get MPI rank and size
-  int rank, size;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-#ifdef DEBUG
-  std::cout << "rank: " << rank << " of " << size << "\n";
-#endif
-
-  // output value
-  float output = 1.0;
-
-  // Struct of parameters //////////////////////////////////////////////////////
-
-  Params p;
-  // TODO XXX FUGLINESS HARD-CODING
-  std::string jobPrefix = "/home/andyras/git/dynamix-ga/";
-  p.inputFile = jobPrefix + "ins/parameters.in";
-  p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
-  p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
-  p.VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
-  p.VBridgeInput = jobPrefix + "ins/Vbridge.in";
-
-  // assign parameters from input file /////////////////////////////////////////
-
-  assignParams(p.inputFile.c_str(), &p);
-
-  initialize(&p);
-
-  // assign GA parameters
-  // make sure this function matches the objective you are using
-  init_wavepacket(c, &p);
-
-  // set number of processors for OpenMP ///////////////////////////////////////
-
-  omp_set_num_threads(p.nproc);
-  mkl_set_num_threads(p.nproc);
-
-  // Make plot files ///////////////////////////////////////////////////////////
-
-  makePlots(&p);
-
-  // only do propagation if not just making plots //////////////////////////////
-
-  if (! p.justPlots) {
-    propagate(&p);
-  }
-
-  // calculate value of objective function /////////////////////////////////////
-#ifdef DEBUG
-  std::cout << "Calculating value of objective function..." << std::endl;
-#endif
-  output = obj_tcpeak(&p);
-
-  std::cout << "whoo" << std::endl;
-
-  return output;
-}
-
-void Initializer(GAGenome &g) {
-  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
-
-  genome.gene(0, GARandomFloat(0.0,0.01));
-  genome.gene(1, GARandomFloat(0.0,0.01));
-  genome.gene(2, GARandomFloat(0.0,0.01));
-
-  return;
 }

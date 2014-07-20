@@ -2,7 +2,18 @@
 
 #include "initializer.hpp"
 
-#define DEBUG
+// #define DEBUG
+
+void gammasInitializer(GAGenome &g) {
+
+  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
+
+  genome.gene(0, GARandomFloat(0.0,0.01)); // gamma1
+  genome.gene(1, GARandomFloat(0.0,0.01)); // gamma2
+  genome.gene(2, GARandomFloat(0.0,0.01)); // gamma1_c
+
+  return;
+}
 
 void init_gammas(GAGenome &c, Params * p) {
   // This function initializes the parameters which are to be changed in an
@@ -17,17 +28,20 @@ void init_gammas(GAGenome &c, Params * p) {
 
   // assign parameters from GA /////////////////////////////////////////////////
 
-#ifdef DEBUG
-  std::cout << "Value of gamma1 is: " << g1 << std::endl;
-  std::cout << "Value of gamma1 is: " << g2 << std::endl;
-  std::cout << "Value of gamma1 is: " << g1_c << std::endl;
-#endif
-
   p->gamma1 = g1;
   p->gamma2 = g2;
   p->gamma1_c = g1_c;
 
   initialize(p);
+
+  return;
+}
+
+void wavepacketInitializer(GAGenome &g) {
+  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
+
+  genome.gene(0, GARandomFloat(0.0,0.01)); // sigma
+  genome.gene(1, GARandomFloat(0.0,0.01)); // mu
 
   return;
 }
@@ -43,11 +57,6 @@ void init_wavepacket(GAGenome &c, Params * p) {
   double bulkGaussMu = genome.gene(1);
 
   // assign parameters from GA /////////////////////////////////////////////////
-
-#ifdef DEBUG
-  std::cout << "Value of bulkGaussSigma is: " << bulkGaussSigma << std::endl;
-  std::cout << "Value of bulkGaussMu is: " << bulkGaussMu << std::endl;
-#endif
 
   p->bulkGaussSigma = bulkGaussSigma;
   p->bulkGaussMu = bulkGaussMu;

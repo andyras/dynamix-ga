@@ -46,7 +46,10 @@ function run {
 fecho "running dynamix-ga..."
 export OMP_NUM_THREADS=${nproc}
 export MKL_NUM_THREADS=${nproc}
-mpiexec ./bin/dynamix-ga
+#mpirun ./bin/dynamix-ga seed $RANDOM
+#mpirun --mca ras_gridengine_show_jobid 1 --mca ras_gridengine_debug 1 --mca ras_gridengine_verbose 30 --mca ras_base_verbose 30 --mca btl_base_verbose 30 --display-allocation --prefix ${OPENMPI} -x LD_LIBRARY_PATH ./bin/dynamix-ga seed $RANDOM
+mpirun --mca ras_base_verbose 30 --mca btl_base_verbose 30 --display-allocation -x LD_LIBRARY_PATH ./bin/dynamix-ga seed $RANDOM
+
 if [ $? == 0 ] ; then
   fecho "dynamix-ga done!"
 else
@@ -120,10 +123,10 @@ done
 
 
 # if modules are available, try to load them.
-if command -v module &> /dev/null; then
-  module load intel
-  module load cvode/2.7.0
-fi
+#if command -v module &> /dev/null; then
+  #module load intel
+  #module load cvode/2.7.0
+#fi
 
 [ $do_compile == 1 ] && compile
 [ $do_run == 1 ] && run

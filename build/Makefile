@@ -15,14 +15,14 @@ BINDIR = ../bin
 CPP = $(HOME)/bin/mpich/bin/mpic++
 CPP = mpic++
 
-CPPFLAGS = -O3 -Wall -std=c++11 -fopenmp
+CPPFLAGS = -O0 -Wall -std=c++11 -fopenmp
 INCLUDES = -I$(INCDIR)
 
 # this should be first in linking order because it depends on sundials
 # dynamix source directory
 DYNAMIXDIR = $(HOME)/git/dynamix/dm/build
 INCLUDES += -I$(DYNAMIXDIR)/include -I$(HOME)/bin/include
-LDFLAGS += -L$(DYNAMIXDIR)/lib -ldynamix -L$(HOME)/bin/lib
+LDFLAGS += -L$(DYNAMIXDIR)/lib -ldynamix
 
 # GALib-mpi source directory
 GALIBDIR = $(HOME)/git/GALib-mpi
