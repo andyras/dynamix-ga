@@ -13,4 +13,8 @@ void wavepacketInitializer(GAGenome &g);
 
 void init_wavepacket(GAGenome &c, Params * p);
 
+void wavepacketGammasInitializer(GAGenome &g);
+
+void init_wavepacketGammas(GAGenome &c, Params * p);
+
 #endif

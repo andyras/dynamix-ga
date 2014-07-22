@@ -82,6 +82,10 @@ int main(int argc, char **argv)
     gp.initializerFn = ::wavepacketInitializer;
     genomeLength = 2;
   }
+  else if (gp.initializer.compare("wavepacketGammas") == 0) {
+    gp.initializerFn = ::wavepacketGammasInitializer;
+    genomeLength = 5;
+  }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
       gp.initializer << "not recognized." << std::endl;
