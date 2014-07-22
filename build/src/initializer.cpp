@@ -8,9 +8,9 @@ void gammasInitializer(GAGenome &g) {
 
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
 
-  genome.gene(0, GARandomFloat(0.0,0.01)); // gamma1
-  genome.gene(1, GARandomFloat(0.0,0.01)); // gamma2
-  genome.gene(2, GARandomFloat(0.0,0.01)); // gamma1_c
+  genome.gene(0, GARandomFloat(0.001,0.05)); // gamma1
+  genome.gene(1, GARandomFloat(0.001,0.05)); // gamma2
+  genome.gene(2, GARandomFloat(0.001,0.05)); // gamma1_c
 
   return;
 }

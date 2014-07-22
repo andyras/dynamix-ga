@@ -43,7 +43,15 @@ int main(int argc, char **argv)
 
   GAParams gp;
 
-  assignGAParams("ins/ga.in", &gp);
+  // each thread needs to read this file separately.
+  int pRank = 0;
+  while (pRank < mpi_tasks) {
+    if (mpi_rank == pRank) {
+      assignGAParams("./ins/ga.in", &gp);
+    }
+    pRank++;
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
 
   void * userData = &gp;
 #ifdef DEBUG
