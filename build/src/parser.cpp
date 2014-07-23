@@ -1,6 +1,6 @@
 #include "parser.hpp"
 
-// #define DEBUG
+#define DEBUG
 #define DEBUGFAIL
 
 void assignGAParams(std::string inputFile, GAParams * p) {
@@ -75,10 +75,10 @@ void assignGAParams(std::string inputFile, GAParams * p) {
     else if (input_param == "doubleObjective") { p->doubleObjective = param_val; }
     else if (input_param == "initializer") { p->initializer = param_val; }
     else if (input_param == "minmax") { p->minmax = param_val; }
-    else if (input_param == "popsize") { p->popsize = stoi(param_val); }
-    else if (input_param == "pMut") { p->pMut = stod(param_val); }
-    else if (input_param == "pCross") { p->pCross = stod(param_val); }
-    else if (input_param == "convergence") { p->convergence = stod(param_val); }
+    else if (input_param == "popsize") { p->popsize = atoi(param_val.c_str()); }
+    else if (input_param == "pMut") { p->pMut = atof(param_val.c_str()); }
+    else if (input_param == "pCross") { p->pCross = atof(param_val.c_str()); }
+    else if (input_param == "convergence") { p->convergence = atof(param_val.c_str()); }
     else {
       std::cerr << "WARNING: unknown input parameter " << input_param << std::endl;
     }

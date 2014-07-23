@@ -17,7 +17,7 @@
 #include "parser.hpp"
 #include "gaparams.hpp"
 
-// #define DEBUG
+#define DEBUG
 
 int mpi_tasks, mpi_rank;
 
@@ -43,15 +43,6 @@ int main(int argc, char **argv)
 
   GAParams gp;
 
-  // master thread reads GA input to string
-  if (mpi_rank == 0) {
-    std::ifstream gaInput("ga.in");
-    std::string gaInputStr((std::istreambuf_iterator<char>(gaInput)),
-			   std::istreambuf_iterator<char>());
-  }
-  // each other thread receives the string as a char array.
-  else {
-  }
   // each thread needs to read this file separately.
   int pRank = 0;
   while (pRank < mpi_tasks) {

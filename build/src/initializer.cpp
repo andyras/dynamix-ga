@@ -2,7 +2,7 @@
 
 #include "initializer.hpp"
 
-// #define DEBUG
+#define DEBUG
 
 void gammasInitializer(GAGenome &g) {
 

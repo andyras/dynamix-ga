@@ -2,7 +2,7 @@
 objectiveType=double
 objective=acceptorPeak
 doubleObjective=coherence
-initializer=wavepacketGammas
+initializer=wavepacket
 minmax=max
 popsize=12
 pMut=0.4

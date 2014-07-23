@@ -20,9 +20,7 @@ INCLUDES = -I$(INCDIR)
 
 # this should be first in linking order because it depends on sundials
 # dynamix source directory
-DYNAMIXDIR = $(HOME)/git/dynamix/dm/build
-INCLUDES += -I$(DYNAMIXDIR)/include -I$(HOME)/bin/include
-LDFLAGS += -L$(DYNAMIXDIR)/lib -ldynamix
+LDFLAGS += -ldynamix
 
 # GALib-mpi source directory
 GALIBDIR = $(HOME)/git/GALib-mpi

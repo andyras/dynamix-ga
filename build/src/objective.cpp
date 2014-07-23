@@ -1,10 +1,14 @@
 #include "objective.hpp"
 
-// #define DEBUG
+#define DEBUG
 
 float singleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
   GAParams * gp = (GAParams *) genome.userData();
+
+#ifdef DEBUG
+  print1DGenes(c);
+#endif
 
   // get MPI rank and size
   int rank, size;
@@ -139,6 +143,10 @@ float singleObjective(GAGenome &c) {
 float doubleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
   GAParams * gp = (GAParams *) genome.userData();
+
+#ifdef DEBUG
+  print1DGenes(c);
+#endif
 
   int pid = getpid();
   // get MPI rank and size
