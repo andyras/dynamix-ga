@@ -43,7 +43,25 @@ int main(int argc, char **argv)
 
   GAParams gp;
 
-  assignGAParams("ins/ga.in", &gp);
+  // master thread reads GA input to string
+  if (mpi_rank == 0) {
+    std::ifstream gaInput("ga.in");
+    std::string gaInputStr((std::istreambuf_iterator<char>(gaInput)),
+			   std::istreambuf_iterator<char>());
+  }
+  // each other thread receives the string as a char array.
+  else {
+  }
+  // each thread needs to read this file separately.
+  int pRank = 0;
+  while (pRank < mpi_tasks) {
+    if (mpi_rank == pRank) {
+      assignGAParams("./ins/ga.in", &gp);
+      usleep(10000); // attempt to prevent file reading issues from conflicting threads
+    }
+    pRank++;
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
 
   void * userData = &gp;
 #ifdef DEBUG
@@ -73,6 +91,10 @@ int main(int argc, char **argv)
   else if (gp.initializer.compare("wavepacket") == 0) {
     gp.initializerFn = ::wavepacketInitializer;
     genomeLength = 2;
+  }
+  else if (gp.initializer.compare("wavepacketGammas") == 0) {
+    gp.initializerFn = ::wavepacketGammasInitializer;
+    genomeLength = 5;
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<

@@ -1,6 +1,7 @@
 #include "parser.hpp"
 
 // #define DEBUG
+#define DEBUGFAIL
 
 void assignGAParams(std::string inputFile, GAParams * p) {
 /* assigns GA params to the Params struct from the input file */
@@ -10,6 +11,9 @@ void assignGAParams(std::string inputFile, GAParams * p) {
   size_t equals_pos;
   size_t space_pos;
 
+  int mpi_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
 #ifdef DEBUG
   std::cout << "\nParsing file: " << inputFile << "\n";
 #endif
@@ -17,9 +21,30 @@ void assignGAParams(std::string inputFile, GAParams * p) {
   std::ifstream bash_in;  // declare input file stream
 
   bash_in.open(inputFile.c_str(), std::ios::in);  // open file as input stream
-  if (bash_in.good() == false) {
-    fprintf(stderr, "ERROR [Inputs]: file '%s' not available for reading\n", inputFile.c_str());
-    exit(-1);
+  unsigned int maxAttempts = 10;
+  for (unsigned int ii = 1; ii <= maxAttempts; ii++) {
+    if (bash_in.good() == false) {
+      std::cerr << "ERROR [Inputs:" << mpi_rank << "]: file '" << inputFile <<
+	"' not available for reading on attempt " << ii << "." << std::endl;
+      if (bash_in.fail()) {
+	std::cerr << "Problem is fail bit." << std::endl;
+      }
+      if (bash_in.bad()) {
+	std::cerr << "Problem is fail bad." << std::endl;
+      }
+      if (bash_in.eof()) {
+	std::cerr << "Problem is fail eof." << std::endl;
+      }
+      bash_in.close();
+      usleep(1e6);
+    }
+    else if (ii == maxAttempts) {
+      std::cerr << "dying after last attempt to read " << inputFile << std::endl;
+      exit(-1);
+    }
+    else {
+      break;
+    }
   }
 
   // read first line of input file
@@ -65,6 +90,10 @@ void assignGAParams(std::string inputFile, GAParams * p) {
 
   // close input file
   bash_in.close();
+
+#ifdef DEBUGFAIL
+  std::cerr << "[" << mpi_rank << "] fail bit for closing " << inputFile << " is " << bash_in.fail() << std::endl;
+#endif
 
   // Error checking
 
