@@ -1,8 +1,8 @@
 ## START INPUT PARAMETERS ##
-objectiveType=double
+objectiveType=single
 objective=acceptorPeak
 doubleObjective=coherence
-initializer=wavepacket
+initializer=wavepacketGammas
 minmax=max
 popsize=24
 pMut=0.4
