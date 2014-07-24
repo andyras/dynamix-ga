@@ -32,8 +32,9 @@ class GAParams {
     double bestScore = 0.0;
     std::vector<double> bestGenome;
 
-    std::vector<double> lBound;
-    std::vector<double> uBound;
+    // upper and lower bounds for genes
+    std::vector<double> lb;
+    std::vector<double> ub;
 };
 
 #endif

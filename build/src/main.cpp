@@ -16,6 +16,7 @@
 #include "output.hpp"
 #include "parser.hpp"
 #include "gaparams.hpp"
+#include "mutator.hpp"
 
 #define DEBUG
 
@@ -78,14 +79,36 @@ int main(int argc, char **argv)
   if (gp.initializer.compare("g1g2g1_c") == 0) {
     gp.initializerFn = ::gammasInitializer;
     genomeLength = 3;
+    gp.lb.resize(genomeLength);
+    gp.ub.resize(genomeLength);
+    for (unsigned int ii = 0; ii < 3; ii++) {
+      gp.lb[ii] = 0.001;
+      gp.ub[ii] = 0.05;
+    }
   }
   else if (gp.initializer.compare("wavepacket") == 0) {
     gp.initializerFn = ::wavepacketInitializer;
     genomeLength = 2;
+    gp.lb.resize(genomeLength);
+    gp.ub.resize(genomeLength);
+    for (unsigned int ii = 0; ii < 2; ii++) {
+      gp.lb[ii] = 0.00;
+      gp.ub[ii] = 0.01; // it would be nice to have these initialized by reading parameters.in
+    }
   }
   else if (gp.initializer.compare("wavepacketGammas") == 0) {
     gp.initializerFn = ::wavepacketGammasInitializer;
     genomeLength = 5;
+    gp.lb.resize(genomeLength);
+    gp.ub.resize(genomeLength);
+    for (unsigned int ii = 0; ii < 3; ii++) {
+      gp.lb[ii] = 0.001;
+      gp.ub[ii] = 0.05;
+    }
+    for (unsigned int ii = 3; ii < (3+2); ii++) {
+      gp.lb[ii] = 0.00;
+      gp.ub[ii] = 0.01;
+    }
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
@@ -93,8 +116,12 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
+  gp.initializerFn = sensibleRandomInitializer;
+
   GA1DArrayGenome<double> genome(genomeLength, gp.objectiveFn, userData);
   genome.initializer(gp.initializerFn);
+
+  genome.mutator(::GA1DArraySensibleRandomMutator);
 
   // initialize structures for best genomes/scores
   double initVal = 0.0;
