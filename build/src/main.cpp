@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     gp.lb.resize(genomeLength);
     gp.ub.resize(genomeLength);
     for (unsigned int ii = 0; ii < 2; ii++) {
-      gp.lb[ii] = 0.00;
+      gp.lb[ii] = 0.0001; // this needs to be ~> the interlevel spacing
       gp.ub[ii] = 0.01; // it would be nice to have these initialized by reading parameters.in
     }
   }
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
       gp.ub[ii] = 0.05;
     }
     for (unsigned int ii = 3; ii < (3+2); ii++) {
-      gp.lb[ii] = 0.00;
+      gp.lb[ii] = 0.0001;
       gp.ub[ii] = 0.01;
     }
   }
