@@ -24,12 +24,16 @@ class GAParams {
 
     void (*initializerFn)(GAGenome &); // function pointer to initializer
     float (*objectiveFn)(GAGenome &); // function pointer to objective
+    int (*mutator)(GAGenome &, float); // function pointer to mutator
 
     // GA1DArrayGenome<double> bestGenome;
 
     bool firstEval = true;
     double bestScore = 0.0;
     std::vector<double> bestGenome;
+
+    std::vector<double> lBound;
+    std::vector<double> uBound;
 };
 
 #endif
