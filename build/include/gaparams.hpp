@@ -2,6 +2,7 @@
 #define __GAPARAMS__
 
 #include <string>
+#include <boost/mpi.hpp>
 
 #include <ga-mpi/ga.h>
 
@@ -35,6 +36,33 @@ class GAParams {
     // upper and lower bounds for genes
     std::vector<double> lb;
     std::vector<double> ub;
+  private:
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+      ar & objectiveType;
+      ar & objective;
+      ar & doubleObjective;
+      ar & initializer;
+      ar & minmax;
+
+      ar & popsize;
+      ar & pMut;
+      ar & pCross;
+      ar & convergence;
+
+      ar & initializerFn;
+      ar & objectiveFn;
+      ar & mutator;
+
+      ar & firstEval;
+      ar & bestScore;
+      ar & bestGenome;
+
+      ar & lb;
+      ar & ub;
+      }
 };
 
 #endif

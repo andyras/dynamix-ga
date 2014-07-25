@@ -29,6 +29,7 @@ INCLUDES += -I$(GALIBDIR)
 LDFLAGS += -L$(GALIBDIR)/ga-mpi -lga-mpi
 
 LDFLAGS += -lsundials_cvode -lsundials_nvecserial
+LDFLAGS += -lboost_mpi -lboost_serialization
 
 # basic compiler-dependent flags
 ifeq ($(CPP),icpc)
