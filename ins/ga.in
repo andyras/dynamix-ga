@@ -1,7 +1,7 @@
 ## START INPUT PARAMETERS ##
 objectiveType=single
 objective=acceptorPeak
-doubleObjective=coherence
+doubleObjectiveType=coherence
 initializer=wavepacket
 minmax=max
 popsize=24

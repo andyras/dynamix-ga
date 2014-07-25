@@ -480,3 +480,36 @@ double objAcceptorFinal(Params * p) {
 
   return f;
 }
+
+
+objectiveTypeFn getObjectiveType(GAParams * p) {
+  if (p->objectiveType.compare("single") == 0) {
+    return singleObjective;
+  }
+  else if (p->objectiveType.compare("double") == 0) {
+    return doubleObjective;
+  }
+  else {
+    std::cerr << "[" << __FUNCTION__ << "]: unrecognized objective type" << p->objectiveType << std::endl;
+    exit(-1);
+  }
+}
+
+objectiveFn getObjective(GAParams * p) {
+  if (p->objective.compare("acceptorPeak") == 0) {
+    return objAcceptorPeak;
+  }
+  else if (p->objective.compare("acceptorAvg") == 0) {
+    return objAcceptorAvg;
+  }
+  else if (p->objective.compare("acceptorAvgAfterPeak") == 0) {
+    return objAcceptorAvgAfterPeak;
+  }
+  else if (p->objective.compare("acceptorFinal") == 0) {
+    return objAcceptorFinal;
+  }
+  else {
+    std::cerr << "[" << __FUNCTION__ << "]: unrecognized objective" << p->objective << std::endl;
+    exit(-1);
+  }
+}

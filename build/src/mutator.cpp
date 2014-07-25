@@ -17,3 +17,7 @@ int GA1DArraySensibleRandomMutator (GAGenome &c, float pMut) {
   }
   return nMut;
 }
+
+mutatorFn getMutator(GAParams * p) {
+  return GA1DArraySensibleRandomMutator;
+}

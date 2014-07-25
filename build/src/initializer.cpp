@@ -115,3 +115,7 @@ void sensibleRandomInitializer(GAGenome &g) {
 
   return;
 }
+
+initializerFn getInitializer(GAParams * p) {
+  return sensibleRandomInitializer;
+}

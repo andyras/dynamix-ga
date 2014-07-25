@@ -72,7 +72,7 @@ void assignGAParams(std::string inputFile, GAParams * p) {
     // extract parameters
     if (input_param == "objectiveType") { p->objectiveType = param_val; }
     else if (input_param == "objective") { p->objective = param_val; }
-    else if (input_param == "doubleObjective") { p->doubleObjective = param_val; }
+    else if (input_param == "doubleObjectiveType") { p->doubleObjectiveType = param_val; }
     else if (input_param == "initializer") { p->initializer = param_val; }
     else if (input_param == "minmax") { p->minmax = param_val; }
     else if (input_param == "popsize") { p->popsize = atoi(param_val.c_str()); }

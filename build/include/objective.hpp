@@ -15,6 +15,9 @@
 #include "params.hpp"
 #include "parser.hpp"
 
+typedef float (*objectiveTypeFn)(GAGenome &); // function pointer to objective
+typedef double (*objectiveFn)(Params *); // function pointer to subobjective
+
 float singleObjective(GAGenome &);
 
 float doubleObjective(GAGenome &);
@@ -26,5 +29,9 @@ double objAcceptorAvg(Params * p);
 double objAcceptorAvgAfterPeak(Params * p);
 
 double objAcceptorFinal(Params * p);
+
+objectiveTypeFn getObjectiveType(GAParams * p);
+
+objectiveFn getObjective(GAParams * p);
 
 #endif

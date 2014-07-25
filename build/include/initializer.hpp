@@ -3,7 +3,10 @@
 
 #include <ga-mpi/ga.h>
 
+#include "gaparams.hpp"
 #include "params.hpp"
+
+typedef void (*initializerFn)(GAGenome &); // function pointer to initializer
 
 void gammasInitializer(GAGenome &g);
 
@@ -18,5 +21,7 @@ void wavepacketGammasInitializer(GAGenome &g);
 void init_wavepacketGammas(GAGenome &c, Params * p);
 
 void sensibleRandomInitializer(GAGenome &g);
+
+initializerFn getInitializer(GAParams * p);
 
 #endif

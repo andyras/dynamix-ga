@@ -1,22 +1,23 @@
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <boost/mpi.hpp>
+#include <dynamix.hpp>
 #include <ga-mpi/ga.h>
 #include <ga-mpi/std_stream.h>
+#include <math.h>
 #include <mpi.h>
-#include <sys/wait.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#include <dynamix.hpp>
 
-#include "objective.hpp"
+#include "gaparams.hpp"
 #include "initializer.hpp"
+#include "mutator.hpp"
+#include "objective.hpp"
 #include "output.hpp"
 #include "parser.hpp"
-#include "gaparams.hpp"
-#include "mutator.hpp"
 
 #define DEBUG
 
@@ -28,6 +29,9 @@ int main(int argc, char **argv)
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &mpi_tasks);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
+  boost::mpi::environment env;
+  boost::mpi::communicator world;
 
   int pid = getpid();
 
@@ -44,15 +48,16 @@ int main(int argc, char **argv)
 
   GAParams gp;
 
-  // each thread needs to read this file separately.
-  int pRank = 0;
-  while (pRank < mpi_tasks) {
-    if (mpi_rank == pRank) {
-      assignGAParams("./ins/ga.in", &gp);
-      usleep(10000); // attempt to prevent file reading issues from conflicting threads
+  if (world.rank() == 0) {
+    assignGAParams("./ins/ga.in", &gp);
+    for (unsigned int ii = 1; ii < world.size(); ii++) {
+      std::cout << "[" << world.rank() << "sending it" << std::endl;
+      world.send(ii, 0, gp);
     }
-    pRank++;
-    MPI_Barrier(MPI_COMM_WORLD);
+  }
+  else {
+    std::cout << "[" << world.rank() << "receiving it" << std::endl;
+    world.recv(0, 0, gp);
   }
 
   void * userData = &gp;
@@ -63,21 +68,9 @@ int main(int argc, char **argv)
 #ifdef DEBUG
   std::cout << "[" << pid << ":" << mpi_rank <<  "] Using " << gp.objectiveType << " objective function." << std::endl;
 #endif
-  if (gp.objectiveType.compare("single") == 0) {
-    gp.objectiveFn = singleObjective;
-  }
-  else if (gp.objectiveType.compare("double") == 0) {
-    gp.objectiveFn = doubleObjective;
-  }
-  else {
-    std::cout << "WARNING [" << __FUNCTION__ << "]: " << "objective type" <<
-      gp.objectiveType << "not recognized." << std::endl;
-    exit(-1);
-  }
 
   unsigned int genomeLength = 0;
   if (gp.initializer.compare("g1g2g1_c") == 0) {
-    gp.initializerFn = ::gammasInitializer;
     genomeLength = 3;
     gp.lb.resize(genomeLength);
     gp.ub.resize(genomeLength);
@@ -87,7 +80,6 @@ int main(int argc, char **argv)
     }
   }
   else if (gp.initializer.compare("wavepacket") == 0) {
-    gp.initializerFn = ::wavepacketInitializer;
     genomeLength = 2;
     gp.lb.resize(genomeLength);
     gp.ub.resize(genomeLength);
@@ -97,7 +89,6 @@ int main(int argc, char **argv)
     }
   }
   else if (gp.initializer.compare("wavepacketGammas") == 0) {
-    gp.initializerFn = ::wavepacketGammasInitializer;
     genomeLength = 5;
     gp.lb.resize(genomeLength);
     gp.ub.resize(genomeLength);
@@ -116,12 +107,10 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  gp.initializerFn = sensibleRandomInitializer;
+  GA1DArrayGenome<double> genome(genomeLength, getObjectiveType(&gp), userData);
+  genome.initializer(getInitializer(&gp));
 
-  GA1DArrayGenome<double> genome(genomeLength, gp.objectiveFn, userData);
-  genome.initializer(gp.initializerFn);
-
-  genome.mutator(::GA1DArraySensibleRandomMutator);
+  genome.mutator(getMutator(&gp));
 
   // initialize structures for best genomes/scores
   double initVal = 0.0;

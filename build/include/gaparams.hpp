@@ -6,13 +6,11 @@
 
 #include <ga-mpi/ga.h>
 
-#include "initializer.hpp"
-
 class GAParams {
   public:
     std::string objectiveType = "single";
     std::string objective = "acceptorPeak";
-    std::string doubleObjective = "coherence";
+    std::string doubleObjectiveType = "coherence";
     std::string initializer = "wavepacket";
     std::string minmax = "min";
 
@@ -23,12 +21,6 @@ class GAParams {
 
     // variables below this line are not controlled by input file //////////////
 
-    void (*initializerFn)(GAGenome &); // function pointer to initializer
-    float (*objectiveFn)(GAGenome &); // function pointer to objective
-    int (*mutator)(GAGenome &, float); // function pointer to mutator
-
-    // GA1DArrayGenome<double> bestGenome;
-
     bool firstEval = true;
     double bestScore = 0.0;
     std::vector<double> bestGenome;
@@ -36,14 +28,16 @@ class GAParams {
     // upper and lower bounds for genes
     std::vector<double> lb;
     std::vector<double> ub;
+
   private:
     friend class boost::serialization::access;
 
+    // this method needs to be updated whenever the data contents change.
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
       ar & objectiveType;
       ar & objective;
-      ar & doubleObjective;
+      ar & doubleObjectiveType;
       ar & initializer;
       ar & minmax;
 
@@ -52,17 +46,13 @@ class GAParams {
       ar & pCross;
       ar & convergence;
 
-      ar & initializerFn;
-      ar & objectiveFn;
-      ar & mutator;
-
       ar & firstEval;
       ar & bestScore;
       ar & bestGenome;
 
       ar & lb;
       ar & ub;
-      }
+    }
 };
 
 #endif
