@@ -5,6 +5,7 @@
 #include <boost/mpi.hpp>
 
 #include <ga-mpi/ga.h>
+#include <params.hpp>
 
 class GAParams {
   public:
@@ -29,6 +30,8 @@ class GAParams {
     std::vector<double> lb;
     std::vector<double> ub;
 
+    Params p;
+
   private:
     friend class boost::serialization::access;
 
@@ -52,6 +55,8 @@ class GAParams {
 
       ar & lb;
       ar & ub;
+
+      ar & p;
     }
 };
 

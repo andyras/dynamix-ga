@@ -1,7 +1,4 @@
 #include <boost/mpi.hpp>
-#include <dynamix.hpp>
-#include <ga-mpi/ga.h>
-#include <ga-mpi/std_stream.h>
 #include <math.h>
 #include <mpi.h>
 #include <stdio.h>
@@ -11,6 +8,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <dynamix.hpp>
+#include <ga-mpi/ga.h>
+#include <ga-mpi/std_stream.h>
+#include <params.hpp>
 
 #include "gaparams.hpp"
 #include "initializer.hpp"
@@ -50,6 +51,7 @@ int main(int argc, char **argv)
 
   if (world.rank() == 0) {
     assignGAParams("./ins/ga.in", &gp);
+    assignParams("./ins/parameters.in", &(gp.p));
     for (unsigned int ii = 1; ii < world.size(); ii++) {
       world.send(ii, 0, gp);
     }

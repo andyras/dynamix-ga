@@ -1,7 +1,7 @@
+### This line should be just about all you have to change ######################
 # name of main executable
-### This line should be just about all you have to change ###
 BIN = dynamix-ga
-#############################################################
+################################################################################
 
 #DEBUG_MAKE = "foo"
 
@@ -17,6 +17,11 @@ CPP = mpic++
 
 CPPFLAGS = -O0 -Wall -std=c++11 -fopenmp
 INCLUDES = -I$(INCDIR)
+
+# optional #####################################################################
+# comment this out if you do not want MPI
+CPPFLAGS += -D__BOOST_SERIALIZE__
+################################################################################
 
 # this should be first in linking order because it depends on sundials
 # dynamix source directory
