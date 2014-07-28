@@ -24,13 +24,8 @@ CPPFLAGS += -D__BOOST_SERIALIZE__
 ################################################################################
 
 # this should be first in linking order because it depends on sundials
-# dynamix source directory
 LDFLAGS += -ldynamix
 
-# GALib-mpi source directory
-GALIBDIR = $(HOME)/git/GALib-mpi
-#INCLUDES += -I$(GALIBDIR)
-#LDFLAGS += -L$(GALIBDIR)/ga-mpi -l/home/andyras/git/GAlib-mpi/ga-mpi/libga-mpi.a
 LDFLAGS += -lga-mpi
 
 LDFLAGS += -lsundials_cvode -lsundials_nvecserial
