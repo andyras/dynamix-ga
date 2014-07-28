@@ -19,7 +19,7 @@
 #include "output.hpp"
 #include "parser.hpp"
 
-#define DEBUG
+// #define DEBUG
 
 int mpi_tasks, mpi_rank;
 
@@ -51,12 +51,10 @@ int main(int argc, char **argv)
   if (world.rank() == 0) {
     assignGAParams("./ins/ga.in", &gp);
     for (unsigned int ii = 1; ii < world.size(); ii++) {
-      std::cout << "[" << world.rank() << "sending it" << std::endl;
       world.send(ii, 0, gp);
     }
   }
   else {
-    std::cout << "[" << world.rank() << "receiving it" << std::endl;
     world.recv(0, 0, gp);
   }
 

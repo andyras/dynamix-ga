@@ -24,16 +24,17 @@ LDFLAGS += -ldynamix
 
 # GALib-mpi source directory
 GALIBDIR = $(HOME)/git/GALib-mpi
-INCLUDES += -I$(GALIBDIR)
+#INCLUDES += -I$(GALIBDIR)
 #LDFLAGS += -L$(GALIBDIR)/ga-mpi -l/home/andyras/git/GAlib-mpi/ga-mpi/libga-mpi.a
-LDFLAGS += -L$(GALIBDIR)/ga-mpi -lga-mpi
+LDFLAGS += -lga-mpi
 
 LDFLAGS += -lsundials_cvode -lsundials_nvecserial
 LDFLAGS += -lboost_mpi -lboost_serialization
 
 # basic compiler-dependent flags
-ifeq ($(CPP),icpc)
-  CPPFLAGS += -fast -xHOST -no-prec-div -mkl -no-multibyte-chars
+COMPILER = $(word 1, $(shell mpic++ -show))
+ifeq ($(COMPILER),icpc)
+  CPPFLAGS += -xHOST -no-prec-div -mkl -no-multibyte-chars
   LDFLAGS += -mkl
 else # g++*
   LDFLAGS += -liomp5

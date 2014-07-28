@@ -1,7 +1,7 @@
 #include "parser.hpp"
 
-#define DEBUG
-#define DEBUGFAIL
+// #define DEBUG
+// #define DEBUGFAIL
 
 void assignGAParams(std::string inputFile, GAParams * p) {
 /* assigns GA params to the Params struct from the input file */

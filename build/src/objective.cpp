@@ -1,6 +1,6 @@
 #include "objective.hpp"
 
-#define DEBUG
+// #define DEBUG
 
 float singleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
