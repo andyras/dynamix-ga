@@ -47,7 +47,7 @@ float singleObjective(GAGenome &c) {
     exit(-1);
   }
 
-  initialize(&p);
+  initialize(&p); // TODO this may be redundant
   makePlots(&p);
   propagate(&p);
 
@@ -176,7 +176,7 @@ float doubleObjective(GAGenome &c) {
 
   p.coherent = 1;
   p.outputDir = "./coh/";
-  initialize(&p);
+  initialize(&p); // TODO this may be redundant
   makePlots(&p);
   propagate(&p);
 
@@ -212,7 +212,7 @@ float doubleObjective(GAGenome &c) {
   // incoherent propagation ////////////////////////////////////////////////////
   p.coherent = 0;
   p.outputDir = "./inc/";
-  initialize(&p);
+  initialize(&p); // TODO this may be redundant
   makePlots(&p);
   propagate(&p);
 

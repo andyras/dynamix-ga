@@ -201,6 +201,15 @@ int main(int argc, char **argv)
       std::cout << " " << bestScores[ii];
     }
     std::cout << std::endl;
+
+    // create new genome and evaluate objective (in order to create outputs)
+    GA1DArrayGenome<double> bg(genomeLength, getObjectiveType(&gp), userData);
+    // fill genome with best parameters
+    for (unsigned int ii = 0; ii < bg.length(); ii++) {
+      bg.gene(ii, bestGenomes[bestIdx*genomeLength + ii]);
+    }
+    // call objective function
+    (* getObjectiveType(&gp))(bg);
   }
 
   MPI_Finalize();
