@@ -22,18 +22,12 @@ float singleObjective(GAGenome &c) {
 
   // Struct of parameters //////////////////////////////////////////////////////
 
-  Params p;
-  // TODO XXX FUGLINESS HARD-CODING
-  std::string jobPrefix = "./";
-  p.inputFile = jobPrefix + "ins/parameters.in";
-  p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
-  p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
-  p.VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
-  p.VBridgeInput = jobPrefix + "ins/Vbridge.in";
+  Params p = gp->p;
 
-  // assign parameters from input file /////////////////////////////////////////
+  // set number of processors for OpenMP ///////////////////////////////////////
 
-  assignParams(p.inputFile.c_str(), &p);
+  omp_set_num_threads(p.nproc);
+  mkl_set_num_threads(p.nproc);
 
   // assign GA parameters
   // this function is independent of the objective you are using. It determines
@@ -54,18 +48,7 @@ float singleObjective(GAGenome &c) {
   }
 
   initialize(&p);
-
-  // set number of processors for OpenMP ///////////////////////////////////////
-
-  omp_set_num_threads(p.nproc);
-  mkl_set_num_threads(p.nproc);
-
-  // Make plot files ///////////////////////////////////////////////////////////
-
   makePlots(&p);
-
-  // propagate /////////////////////////////////////////////////////////////////
-
   propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
@@ -164,22 +147,12 @@ float doubleObjective(GAGenome &c) {
 
   // Struct of parameters //////////////////////////////////////////////////////
 
-  Params p;
+  Params p = gp->p;
 
-  // TODO XXX FUGLINESS HARD-CODING
-  std::string jobPrefix = "./";
-  p.inputFile = jobPrefix + "ins/parameters.in";
-  p.cEnergiesInput = jobPrefix + "ins/c_energies.in";
-  p.bEnergiesInput = jobPrefix + "ins/b_energies.in";
-  p.VNoBridgeInput = jobPrefix + "ins/Vnobridge.in";
-  p.VBridgeInput = jobPrefix + "ins/Vbridge.in";
+  // set number of processors for OpenMP ///////////////////////////////////////
 
-  // coherent propagation //////////////////////////////////////////////////////
-
-  // assign parameters from input file /////////////////////////////////////////
-
-  assignParams(p.inputFile.c_str(), &p);
-  p.coherent = 1;
+  omp_set_num_threads(p.nproc);
+  mkl_set_num_threads(p.nproc);
 
   // assign GA parameters
   // this function is independent of the objective you are using. It determines
@@ -199,19 +172,12 @@ float doubleObjective(GAGenome &c) {
     exit(-1);
   }
 
+  // coherent propagation //////////////////////////////////////////////////////
+
+  p.coherent = 1;
+  p.outputDir = "./coh/";
   initialize(&p);
-
-  // Make plot files ///////////////////////////////////////////////////////////
-
   makePlots(&p);
-
-  // set number of processors for OpenMP ///////////////////////////////////////
-
-  omp_set_num_threads(p.nproc);
-  mkl_set_num_threads(p.nproc);
-
-  // propagate /////////////////////////////////////////////////////////////////
-
   propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
@@ -219,7 +185,6 @@ float doubleObjective(GAGenome &c) {
   std::cout << "[" << pid << ":" << rank << "] " <<
     "Calculating value of objective function..." << std::endl;
 #endif
-  // set 'output' according to an objective function ///////////////////////////
   if (gp->objective.compare("acceptorPeak") == 0) {
     output1 = objAcceptorPeak(&p);
   }
@@ -246,8 +211,12 @@ float doubleObjective(GAGenome &c) {
 
   // incoherent propagation ////////////////////////////////////////////////////
   p.coherent = 0;
+  p.outputDir = "./inc/";
   initialize(&p);
+  makePlots(&p);
   propagate(&p);
+
+  // calculate value of objective function /////////////////////////////////////
 #ifdef DEBUG
   std::cout << "[" << pid << ":" << rank << "] " <<
     "Calculating value of objective function again..." << std::endl;
