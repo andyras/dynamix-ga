@@ -18,8 +18,8 @@ CPP = mpic++
 CPPFLAGS = -O0 -Wall -std=c++11 -fopenmp
 INCLUDES = -I$(INCDIR)
 
-# optional #####################################################################
-# comment this out if you do not want MPI
+################################################################################
+# this is needed for included header files from dynamix
 CPPFLAGS += -D__BOOST_SERIALIZE__
 ################################################################################
 
