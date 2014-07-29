@@ -12,7 +12,6 @@ SRCDIR = ./src
 BINDIR = ../bin
 
 # compiler
-CPP = $(HOME)/bin/mpich/bin/mpic++
 CPP = mpic++
 
 CPPFLAGS = -O0 -Wall -std=c++11 -fopenmp

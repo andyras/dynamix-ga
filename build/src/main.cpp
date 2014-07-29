@@ -52,7 +52,7 @@ int main(int argc, char **argv)
   if (world.rank() == 0) {
     assignGAParams("./ins/ga.in", &gp);
     assignParams("./ins/parameters.in", &(gp.p));
-    for (unsigned int ii = 1; ii < world.size(); ii++) {
+    for (int ii = 1; ii < world.size(); ii++) {
       world.send(ii, 0, gp);
     }
   }
@@ -205,7 +205,7 @@ int main(int argc, char **argv)
     // create new genome and evaluate objective (in order to create outputs)
     GA1DArrayGenome<double> bg(genomeLength, getObjectiveType(&gp), userData);
     // fill genome with best parameters
-    for (unsigned int ii = 0; ii < bg.length(); ii++) {
+    for (int ii = 0; ii < bg.length(); ii++) {
       bg.gene(ii, bestGenomes[bestIdx*genomeLength + ii]);
     }
     // call objective function
