@@ -52,6 +52,7 @@ int main(int argc, char **argv)
   if (world.rank() == 0) {
     assignGAParams("./ins/ga.in", &gp);
     assignParams("./ins/parameters.in", &(gp.p));
+    initialize(&(gp.p));
     for (int ii = 1; ii < world.size(); ii++) {
       world.send(ii, 0, gp);
     }

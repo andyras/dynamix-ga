@@ -1,6 +1,7 @@
 #ifndef __INITIALIZER__
 #define __INITIALIZER__
 
+#include <dynamix.hpp>
 #include <ga-mpi/ga.h>
 
 #include "gaparams.hpp"

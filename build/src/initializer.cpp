@@ -1,6 +1,3 @@
-#include <dynamix.hpp>
-
-#include "gaparams.hpp"
 #include "initializer.hpp"
 
 // #define DEBUG
@@ -33,7 +30,7 @@ void init_gammas(GAGenome &c, Params * p) {
   p->gamma2 = g2;
   p->gamma1_c = g1_c;
 
-  initialize(p);
+  initWavefunction(p);
 
   return;
 }
@@ -62,7 +59,7 @@ void init_wavepacket(GAGenome &c, Params * p) {
   p->bulkGaussSigma = bulkGaussSigma;
   p->bulkGaussMu = bulkGaussMu;
 
-  initialize(p);
+  initWavefunction(p);
 
   return;
 }
@@ -100,7 +97,7 @@ void init_wavepacketGammas(GAGenome &c, Params * p) {
   p->bulkGaussSigma = bulkGaussSigma;
   p->bulkGaussMu = bulkGaussMu;
 
-  initialize(p);
+  initWavefunction(p);
 
   return;
 }
