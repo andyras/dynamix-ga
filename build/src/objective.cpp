@@ -176,6 +176,7 @@ float doubleObjective(GAGenome &c) {
   p.coherent = 1;
   p.outputDir = "./coh/";
   makePlots(&p);
+  initWavefunction(&p);
   propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
@@ -211,6 +212,7 @@ float doubleObjective(GAGenome &c) {
   p.coherent = 0;
   p.outputDir = "./inc/";
   makePlots(&p);
+  initWavefunction(&p);
   propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
