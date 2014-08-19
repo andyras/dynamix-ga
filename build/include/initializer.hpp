@@ -22,6 +22,8 @@ void wavepacketGammasInitializer(GAGenome &g);
 
 void init_wavepacketGammas(GAGenome &c, Params * p);
 
+void init_torsion(GAGenome &c, Params * p);
+
 void sensibleRandomInitializer(GAGenome &g);
 
 initializerFn getInitializer(GAParams * p);
