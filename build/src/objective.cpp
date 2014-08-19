@@ -41,6 +41,9 @@ float singleObjective(GAGenome &c) {
   else if (gp->initializer.compare("wavepacketGammas") == 0) {
     init_wavepacketGammas(c, &p);
   }
+  else if (gp->initializer.compare("torsion") == 0) {
+    init_torsion(c, &p);
+  }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
       gp->initializer << "not recognized." << std::endl;
@@ -164,6 +167,9 @@ float doubleObjective(GAGenome &c) {
   }
   else if (gp->initializer.compare("wavepacketGammas") == 0) {
     init_wavepacketGammas(c, &p);
+  }
+  else if (gp->initializer.compare("torsion") == 0) {
+    init_torsion(c, &p);
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<

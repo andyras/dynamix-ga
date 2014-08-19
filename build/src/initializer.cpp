@@ -102,6 +102,25 @@ void init_wavepacketGammas(GAGenome &c, Params * p) {
   return;
 }
 
+void init_torsion(GAGenome &c, Params * p) {
+  // this function initializes variables relevant to having a torsional coupling
+
+  GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
+
+  double Vs = genome.gene(0);
+  double Vp = genome.gene(1);
+  double Eb = genome.gene(2);
+
+  assert(p->Nb == 2);
+
+  p->torsionSin2V0 = genome.gene(0); // constant component of torsional coupling
+  p->torsionSin2V1 = genome.gene(1); // time-dependent component of torsional coupling
+  p->energies[p->Ib] = genome.gene(2);    // first bridge site energy
+  p->energies[p->Ib+1] = genome.gene(2);  // second bridge site energy
+
+  return;
+}
+
 void sensibleRandomInitializer(GAGenome &g) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)g;
   GAParams * gp = (GAParams *) genome.userData();
@@ -114,5 +133,7 @@ void sensibleRandomInitializer(GAGenome &g) {
 }
 
 initializerFn getInitializer(GAParams * p) {
+  // XXX: this is hacked a bit to just return what I hope to use in general, the
+  // sensibleRandomInitializer.
   return sensibleRandomInitializer;
 }

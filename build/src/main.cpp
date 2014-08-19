@@ -102,6 +102,20 @@ int main(int argc, char **argv)
       gp.ub[ii] = 0.01;
     }
   }
+  else if (gp.initializer.compare("torsion") == 0) {
+    genomeLength = 3;
+    gp.lb.resize(genomeLength);
+    gp.ub.resize(genomeLength);
+    // torsionSin2V0
+    gp.lb[0] = 0.00001;
+    gp.ub[0] = 0.01;
+    // torsionSin2V1
+    gp.lb[1] = 0.00001;
+    gp.ub[1] = 0.01;
+    // Eb
+    gp.lb[2] = gp.p.kBandEdge;
+    gp.ub[2] = gp.p.kBandTop;
+  }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
       gp.initializer << "not recognized." << std::endl;
