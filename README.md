@@ -1,3 +1,17 @@
+## Creating a new set of variables to optimize
+In order to optimize a new set of variables, these things need to be added to the source code:
+
+1. `initializer.cpp` needs a new function to take an individual's genome and change the proper parameters in the `dynamix` *Params* object. The naming convention for the function is `init_XXX`, where `XXX` matches the `initializer` parameter from the `dynamix-ga` *GAParams* object.
+
+2. `main.cpp` needs to have an `else if` condition added where the proper upper and lower bounds for each parameter are set according to the value of `GAParams.initializer`.
+
+3. `objective.cpp` needs to be updated in the `singleObjective` and `doubleObjective` functions to call the proper `init_XXX` function according to the value of `GAParams.initializer`.
+
+4. `README.md` should be updated!
+
+I would like to make a more flexible way to change parameters, but a lot of that depends on how things are initialized in the original `dynamix` code... some things (like changing the number of states on the acceptor) are a bit tricky to set up.
+
+
 ## Input parameters
 
 The file `ga.in` contains input parameters relevant for the genetic algorithm.
