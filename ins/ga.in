@@ -2,7 +2,7 @@
 objectiveType=double
 objective=acceptorPeak
 doubleObjectiveType=coherence
-initializer=wavepacket
+initializer=torsion
 minmax=max
 popsize=24
 pMut=0.4

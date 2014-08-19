@@ -108,10 +108,10 @@ int main(int argc, char **argv)
     gp.ub.resize(genomeLength);
     // torsionSin2V0
     gp.lb[0] = 0.00001;
-    gp.ub[0] = 0.01;
+    gp.ub[0] = 0.001;
     // torsionSin2V1
     gp.lb[1] = 0.00001;
-    gp.ub[1] = 0.01;
+    gp.ub[1] = 0.001;
     // Eb
     gp.lb[2] = gp.p.kBandEdge;
     gp.ub[2] = gp.p.kBandTop;
