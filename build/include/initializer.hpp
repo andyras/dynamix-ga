@@ -4,7 +4,6 @@
 #include <dynamix.hpp>
 #include <ga-mpi/ga.h>
 
-#include <assert.h>
 #include "gaparams.hpp"
 #include "params.hpp"
 

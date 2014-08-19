@@ -107,12 +107,6 @@ void init_torsion(GAGenome &c, Params * p) {
 
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
 
-  double Vs = genome.gene(0);
-  double Vp = genome.gene(1);
-  double Eb = genome.gene(2);
-
-  assert(p->Nb == 2);
-
   p->torsionSin2V0 = genome.gene(0); // constant component of torsional coupling
   p->torsionSin2V1 = genome.gene(1); // time-dependent component of torsional coupling
   p->energies[p->Ib] = genome.gene(2);    // first bridge site energy
