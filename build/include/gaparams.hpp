@@ -1,11 +1,15 @@
 #ifndef __GAPARAMS__
 #define __GAPARAMS__
 
+#include <tuple>
 #include <string>
 #include <boost/mpi.hpp>
 
 #include <ga-mpi/ga.h>
 #include <params.hpp>
+
+typedef float (*objectiveTypeFn)(GAGenome &); // function pointer to objective
+typedef double (*objectiveFn)(Params *); // function pointer to subobjective
 
 class GAParams {
   public:

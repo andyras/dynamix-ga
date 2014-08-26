@@ -13,10 +13,8 @@
 #include <ga-mpi/std_stream.h>
 #include <params.hpp>
 
-#include "gaparams.hpp"
 #include "initializer.hpp"
 #include "mutator.hpp"
-#include "objective.hpp"
 #include "output.hpp"
 #include "parser.hpp"
 
@@ -48,20 +46,21 @@ int main(int argc, char **argv)
   int ngen = 200; // Generations
 
   GAParams gp;
+  dynamixGAParams dgp;
 
   if (world.rank() == 0) {
-    assignGAParams("./ins/ga.in", &gp);
-    assignParams("./ins/parameters.in", &(gp.p));
-    initialize(&(gp.p));
+    assignGAParams("./ins/ga.in", &dgp);
+    assignParams("./ins/parameters.in", &(dgp.gp.p));
+    initialize(&(dgp.gp.p));
     for (int ii = 1; ii < world.size(); ii++) {
-      world.send(ii, 0, gp);
+      world.send(ii, 0, dgp);
     }
   }
   else {
-    world.recv(0, 0, gp);
+    world.recv(0, 0, dgp);
   }
 
-  void * userData = &gp;
+  void * userData = &(dgp.gp);
 #ifdef DEBUG
   std::cout << "[" << pid << ":" << mpi_rank <<  "] userData is " << userData << std::endl;
 #endif
@@ -71,94 +70,94 @@ int main(int argc, char **argv)
 #endif
 
   unsigned int genomeLength = 0;
-  if (gp.initializer.compare("g1g2g1_c") == 0) {
+  if (dgp.gp.initializer.compare("g1g2g1_c") == 0) {
     genomeLength = 3;
-    gp.lb.resize(genomeLength);
-    gp.ub.resize(genomeLength);
+    dgp.gp.lb.resize(genomeLength);
+    dgp.gp.ub.resize(genomeLength);
     for (unsigned int ii = 0; ii < 3; ii++) {
-      gp.lb[ii] = 0.001;
-      gp.ub[ii] = 0.05;
+      dgp.gp.lb[ii] = 0.001;
+      dgp.gp.ub[ii] = 0.05;
     }
   }
-  else if (gp.initializer.compare("wavepacket") == 0) {
+  else if (dgp.gp.initializer.compare("wavepacket") == 0) {
     genomeLength = 2;
-    gp.lb.resize(genomeLength);
-    gp.ub.resize(genomeLength);
+    dgp.gp.lb.resize(genomeLength);
+    dgp.gp.ub.resize(genomeLength);
     for (unsigned int ii = 0; ii < 2; ii++) {
-      gp.lb[ii] = 0.0001; // this needs to be ~> the interlevel spacing
-      gp.ub[ii] = 0.01; // it would be nice to have these initialized by reading parameters.in
+      dgp.gp.lb[ii] = 0.0001; // this needs to be ~> the interlevel spacing
+      dgp.gp.ub[ii] = 0.01; // it would be nice to have these initialized by reading parameters.in
     }
   }
-  else if (gp.initializer.compare("wavepacketGammas") == 0) {
+  else if (dgp.gp.initializer.compare("wavepacketGammas") == 0) {
     genomeLength = 5;
-    gp.lb.resize(genomeLength);
-    gp.ub.resize(genomeLength);
+    dgp.gp.lb.resize(genomeLength);
+    dgp.gp.ub.resize(genomeLength);
     for (unsigned int ii = 0; ii < 3; ii++) {
-      gp.lb[ii] = 0.001;
-      gp.ub[ii] = 0.05;
+      dgp.gp.lb[ii] = 0.001;
+      dgp.gp.ub[ii] = 0.05;
     }
     for (unsigned int ii = 3; ii < (3+2); ii++) {
-      gp.lb[ii] = 0.0001;
-      gp.ub[ii] = 0.01;
+      dgp.gp.lb[ii] = 0.0001;
+      dgp.gp.ub[ii] = 0.01;
     }
   }
-  else if (gp.initializer.compare("torsion") == 0) {
+  else if (dgp.gp.initializer.compare("torsion") == 0) {
     genomeLength = 3;
-    gp.lb.resize(genomeLength);
-    gp.ub.resize(genomeLength);
+    dgp.gp.lb.resize(genomeLength);
+    dgp.gp.ub.resize(genomeLength);
     // torsionSin2V0
-    gp.lb[0] = 0.00001;
-    gp.ub[0] = 0.001;
+    dgp.gp.lb[0] = 0.00001;
+    dgp.gp.ub[0] = 0.001;
     // torsionSin2V1
-    gp.lb[1] = 0.00001;
-    gp.ub[1] = 0.001;
+    dgp.gp.lb[1] = 0.00001;
+    dgp.gp.ub[1] = 0.001;
     // Eb
-    gp.lb[2] = gp.p.kBandEdge;
-    gp.ub[2] = gp.p.kBandTop;
+    dgp.gp.lb[2] = dgp.gp.p.kBandEdge;
+    dgp.gp.ub[2] = dgp.gp.p.kBandTop;
   }
   else {
     std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp.initializer << "not recognized." << std::endl;
+      dgp.gp.initializer << "not recognized." << std::endl;
     exit(-1);
   }
 
-  GA1DArrayGenome<double> genome(genomeLength, getObjectiveType(&gp), userData);
-  genome.initializer(getInitializer(&gp));
+  GA1DArrayGenome<double> genome(genomeLength, dgp.getObjectiveType(), userData);
+  genome.initializer(getInitializer(&(dgp.gp)));
 
-  genome.mutator(getMutator(&gp));
+  genome.mutator(getMutator(&(dgp.gp)));
 
   // initialize structures for best genomes/scores
   double initVal = 0.0;
-  if (gp.minmax.compare("min") == 0) {
+  if (dgp.gp.minmax.compare("min") == 0) {
     initVal = INFINITY;
   }
-  else if (gp.minmax.compare("max") == 0) {
+  else if (dgp.gp.minmax.compare("max") == 0) {
     initVal = -INFINITY;
   }
 
-  gp.bestScore = initVal;
-  gp.bestGenome.resize(genomeLength);
+  dgp.gp.bestScore = initVal;
+  dgp.gp.bestGenome.resize(genomeLength);
   // Now create the GA using the genome and run it. We'll use sigma truncation
   // scaling so that we can handle negative objective scores.
   GASimpleGA ga(genome); // TODO change to steady-state
   ga.userData(userData);
   GALinearScaling scaling;
-  if (gp.minmax.compare("min") == 0) {
+  if (dgp.gp.minmax.compare("min") == 0) {
     ga.minimize();
-    ga.pConvergence(1.0 + gp.convergence);
+    ga.pConvergence(1.0 + dgp.gp.convergence);
   }
-  else if (gp.minmax.compare("max") == 0) {
+  else if (dgp.gp.minmax.compare("max") == 0) {
     ga.maximize();
-    ga.pConvergence(1.0 - gp.convergence);
+    ga.pConvergence(1.0 - dgp.gp.convergence);
   }
   else {
-    std::cerr << "ERROR: unrecognized minmax: << " << gp.minmax << std::endl;
+    std::cerr << "ERROR: unrecognized minmax: << " << dgp.gp.minmax << std::endl;
     exit(0);
   }
-  ga.populationSize(gp.popsize);
+  ga.populationSize(dgp.gp.popsize);
   ga.nGenerations(ngen);
-  ga.pMutation(gp.pMut);
-  ga.pCrossover(gp.pCross);
+  ga.pMutation(dgp.gp.pMut);
+  ga.pCrossover(dgp.gp.pCross);
   ga.terminator(GAGeneticAlgorithm::TerminateUponConvergence);
   ga.scaling(scaling);
   if(mpi_rank == 0)
@@ -185,12 +184,12 @@ int main(int argc, char **argv)
   MPI_Barrier(MPI_COMM_WORLD);
 
   // gather best scores ////////////////////////////////////////////////////////
-  MPI_Gather(&gp.bestScore, 1, MPI_DOUBLE,
+  MPI_Gather(&(dgp.gp.bestScore), 1, MPI_DOUBLE,
              &(bestScores[0]), 1, MPI_DOUBLE,
              0, MPI_COMM_WORLD);
 
   // gather best genomes ///////////////////////////////////////////////////////
-  MPI_Gather(&(gp.bestGenome[0]), genomeLength, MPI_DOUBLE,
+  MPI_Gather(&(dgp.gp.bestGenome[0]), genomeLength, MPI_DOUBLE,
              &(bestGenomes[0]), genomeLength, MPI_DOUBLE,
              0, MPI_COMM_WORLD);
 
@@ -199,7 +198,7 @@ int main(int argc, char **argv)
   {
     // find rank of best score
     auto bestScore = std::min_element(bestScores.begin(), bestScores.end());
-    if (gp.minmax.compare("max") == 0) {
+    if (dgp.gp.minmax.compare("max") == 0) {
       bestScore = std::max_element(bestScores.begin(), bestScores.end());
     }
     unsigned int bestIdx = std::distance(bestScores.begin(), bestScore);
@@ -218,13 +217,13 @@ int main(int argc, char **argv)
     std::cout << std::endl;
 
     // create new genome and evaluate objective (in order to create outputs)
-    GA1DArrayGenome<double> bg(genomeLength, getObjectiveType(&gp), userData);
+    GA1DArrayGenome<double> bg(genomeLength, dgp.getObjectiveType(), userData);
     // fill genome with best parameters
     for (int ii = 0; ii < bg.length(); ii++) {
       bg.gene(ii, bestGenomes[bestIdx*genomeLength + ii]);
     }
     // call objective function
-    (* getObjectiveType(&gp))(bg);
+    (* dgp.getObjectiveType())(bg);
   }
 
   MPI_Finalize();

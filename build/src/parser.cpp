@@ -3,13 +3,16 @@
 // #define DEBUG
 // #define DEBUGFAIL
 
-void assignGAParams(std::string inputFile, GAParams * p) {
+void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
 /* assigns GA params to the Params struct from the input file */
   std::string line;
   std::string input_param;
   std::string param_val;
   size_t equals_pos;
   size_t space_pos;
+
+  GAParams * p = &(dgp->gp);
+
 
   int mpi_rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
@@ -85,7 +88,32 @@ void assignGAParams(std::string inputFile, GAParams * p) {
 #ifdef DEBUG
     std::cout << "Parameter: " << input_param << std::endl << "New value: " << param_val << std::endl;
 #endif
-    getline (bash_in,line);
+    getline(bash_in, line);
+  }
+
+  // get weights for fitness function //////////////////////////////////////////
+  std::vector<std::string> strs; // vector to hold split lines
+
+  while (line != "[fitness]") {
+    getline(bash_in, line);
+  }
+  while (line != "[end]") {
+    // skip comment lines
+    if ( line.substr(0,1) == "#" ) {
+      getline (bash_in,line);
+      continue;
+    }
+
+    // check that line has two tokens
+    boost::split(strs, line, boost::is_any_of("\t "));
+    if (strs.size() != 2) {
+      std::cerr << "line '" << line << "' has " << strs.size() << " tokens (2 expected), skipping line" << std::endl;
+    }
+
+    dgp->ot.addObjWeight(strs[0], stod(strs[1]));
+
+    // get next line
+    getline(bash_in, line);
   }
 
   // close input file
