@@ -94,26 +94,27 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
   // get weights for fitness function //////////////////////////////////////////
   std::vector<std::string> strs; // vector to hold split lines
 
-  while (line != "[fitness]") {
-    getline(bash_in, line);
-  }
-  while (line != "[end]") {
-    // skip comment lines
-    if ( line.substr(0,1) == "#" ) {
-      getline (bash_in,line);
-      continue;
+  for (; getline(bash_in, line); ) {
+    if (line == "[fitness]") {
+      std::cout << "WHOO" << line << std::endl;
+      while (line != "[end]") {
+        // skip comment lines
+        if ( line.substr(0,1) == "#" ) {
+          getline (bash_in,line);
+          continue;
+        }
+
+        // check that line has two tokens
+        boost::split(strs, line, boost::is_any_of("\t "));
+        if (strs.size() != 2) {
+          std::cerr << "line '" << line << "' has " << strs.size() << " tokens (2 expected), skipping line" << std::endl;
+        }
+
+        dgp->ot.addObjWeight(strs[0], stod(strs[1]));
+
+        // get next line
+      }
     }
-
-    // check that line has two tokens
-    boost::split(strs, line, boost::is_any_of("\t "));
-    if (strs.size() != 2) {
-      std::cerr << "line '" << line << "' has " << strs.size() << " tokens (2 expected), skipping line" << std::endl;
-    }
-
-    dgp->ot.addObjWeight(strs[0], stod(strs[1]));
-
-    // get next line
-    getline(bash_in, line);
   }
 
   // close input file
