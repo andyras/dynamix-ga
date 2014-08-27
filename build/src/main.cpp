@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     world.recv(0, 0, dgp);
   }
 
-  void * userData = &(dgp.gp);
+  void * userData = &dgp;
 #ifdef DEBUG
   std::cout << "[" << pid << ":" << mpi_rank <<  "] userData is " << userData << std::endl;
 #endif

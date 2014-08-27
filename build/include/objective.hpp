@@ -10,6 +10,7 @@
 #include <ga-mpi/ga.h>
 #include <propagate.hpp>
 
+#include "dynamixGAParams.hpp"
 #include "initializer.hpp"
 #include "output.hpp"
 #include "params.hpp"

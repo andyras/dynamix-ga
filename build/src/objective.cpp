@@ -4,7 +4,8 @@
 
 float singleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
-  GAParams * gp = (GAParams *) genome.userData();
+  dynamixGAParams * dgp = (dynamixGAParams *) genome.userData();
+  GAParams * gp = &(dgp->gp);
 
 #ifdef DEBUG
   print1DGenes(c);
@@ -128,7 +129,8 @@ float singleObjective(GAGenome &c) {
 
 float doubleObjective(GAGenome &c) {
   GA1DArrayGenome<double> &genome = (GA1DArrayGenome<double> &)c;
-  GAParams * gp = (GAParams *) genome.userData();
+  dynamixGAParams * dgp = (dynamixGAParams *) genome.userData();
+  GAParams * gp = &(dgp->gp);
 
 #ifdef DEBUG
   print1DGenes(c);
