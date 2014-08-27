@@ -5,7 +5,8 @@
 #include <tuple>
 #include <vector>
 
-#include "objective.hpp"
+#include "gaparams.hpp"
+#include "subobjective.hpp"
 
 class objTuple {
 public:

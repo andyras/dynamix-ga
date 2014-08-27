@@ -5,6 +5,7 @@
 
 #include "gaparams.hpp"
 #include "objTuple.hpp"
+#include "objective.hpp"
 
 class dynamixGAParams {
 public:

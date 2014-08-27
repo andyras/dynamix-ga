@@ -14,17 +14,10 @@
 #include "initializer.hpp"
 #include "output.hpp"
 #include "params.hpp"
+#include "subobjective.hpp"
 
 float singleObjective(GAGenome &);
 
 float doubleObjective(GAGenome &);
-
-double objAcceptorPeak(Params * p);
-
-double objAcceptorAvg(Params * p);
-
-double objAcceptorAvgAfterPeak(Params * p);
-
-double objAcceptorFinal(Params * p);
 
 #endif
