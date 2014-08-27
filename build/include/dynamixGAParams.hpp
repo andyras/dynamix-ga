@@ -18,7 +18,6 @@ public:
 
   // methods ///////////////////////////////////////////////////////////////////
   objectiveTypeFn getObjectiveType();
-  objectiveFn getObjective();
 
   initializerFn getInitializer();
 

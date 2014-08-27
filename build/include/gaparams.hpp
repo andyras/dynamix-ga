@@ -18,7 +18,6 @@ typedef int (*mutatorFn)(GAGenome &, float); // function pointer to mutator
 class GAParams {
   public:
     std::string objectiveType = "single";
-    std::string objective = "acceptorPeak";
     std::string doubleObjectiveType = "coherence";
     std::string initializer = "wavepacket";
     std::string minmax = "min";
@@ -47,7 +46,6 @@ class GAParams {
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
       ar & objectiveType;
-      ar & objective;
       ar & doubleObjectiveType;
       ar & initializer;
       ar & minmax;

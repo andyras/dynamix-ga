@@ -74,7 +74,6 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
     param_val = line.substr(int(equals_pos)+1,int(space_pos)-int(equals_pos));
     // extract parameters
     if (input_param == "objectiveType") { p->objectiveType = param_val; }
-    else if (input_param == "objective") { p->objective = param_val; }
     else if (input_param == "doubleObjectiveType") { p->doubleObjectiveType = param_val; }
     else if (input_param == "initializer") { p->initializer = param_val; }
     else if (input_param == "minmax") { p->minmax = param_val; }

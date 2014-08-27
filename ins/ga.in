@@ -1,6 +1,5 @@
 ## START INPUT PARAMETERS ##
 objectiveType=single
-objective=acceptorPeak
 doubleObjectiveType=coherence
 initializer=wavepacket
 minmax=max
