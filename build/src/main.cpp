@@ -13,7 +13,7 @@
 #include <ga-mpi/std_stream.h>
 #include <params.hpp>
 
-#include "initializer.hpp"
+#include "initializeGenome.hpp"
 #include "mutator.hpp"
 #include "output.hpp"
 #include "parser.hpp"

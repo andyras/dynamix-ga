@@ -11,7 +11,7 @@
 #include <propagate.hpp>
 
 #include "dynamixGAParams.hpp"
-#include "initializer.hpp"
+#include "initializeParams.hpp"
 #include "output.hpp"
 #include "params.hpp"
 #include "subobjective.hpp"
