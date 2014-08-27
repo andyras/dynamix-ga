@@ -73,25 +73,6 @@ float singleObjective(GAGenome &c) {
     output += (*obj)(&p)*w; // dereference the function pointer and call it
   }
 
-  // set 'output' according to an objective function ///////////////////////////
-  if (gp->objective.compare("acceptorPeak") == 0) {
-    output = objAcceptorPeak(&p);
-  }
-  else if (gp->objective.compare("acceptorAvg") == 0) {
-    output = objAcceptorAvg(&p);
-  }
-  else if (gp->objective.compare("acceptorAvgAfterPeak") == 0) {
-    output = objAcceptorAvgAfterPeak(&p);
-  }
-  else if (gp->objective.compare("acceptorFinal") == 0) {
-    output = objAcceptorFinal(&p);
-  }
-  else {
-    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
-      gp->objective << "not recognized." << std::endl;
-    exit(-1);
-  }
-
   std::cout << "[" << pid << ":" << rank << "] " << "Objective: " << output << " Genome:";
   for (unsigned int ii = 0; ii < (unsigned int) genome.length(); ii++) {
     std::cout << " " << genome.gene(ii);
@@ -206,22 +187,18 @@ float doubleObjective(GAGenome &c) {
   std::cout << "[" << pid << ":" << rank << "] " <<
     "Calculating value of objective function..." << std::endl;
 #endif
-  if (gp->objective.compare("acceptorPeak") == 0) {
-    output1 = objAcceptorPeak(&p);
-  }
-  else if (gp->objective.compare("acceptorAvg") == 0) {
-    output1 = objAcceptorAvg(&p);
-  }
-  else if (gp->objective.compare("acceptorAvgAfterPeak") == 0) {
-    output1 = objAcceptorAvgAfterPeak(&p);
-  }
-  else if (gp->objective.compare("acceptorFinal") == 0) {
-    output1 = objAcceptorFinal(&p);
-  }
-  else {
-    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
-      gp->objective << "not recognized." << std::endl;
-    exit(-1);
+  output1 = 0.0;
+  std::vector< std::tuple<objectiveFn, double> > obs = dgp->ot.getObjWeights();
+  objectiveFn obj; // objective function to call
+  double w; // weight
+  // call each objective fn and add the weighted value to the output ///////////
+  for (unsigned int ii = 0; ii < obs.size(); ii++) {
+    obj = std::get<0>(obs[ii]);
+    w = std::get<1>(obs[ii]);
+#ifdef DEBUG
+    std::cout << "objective value is " << (*obj)(&p) << " and weight is " << w << std::endl;
+#endif
+    output1 += (*obj)(&p)*w; // dereference the function pointer and call it
   }
 
   std::cout << "[" << pid << ":" << rank << "] " << "Objective 1: " << output1 << " Genome:";
@@ -242,22 +219,15 @@ float doubleObjective(GAGenome &c) {
   std::cout << "[" << pid << ":" << rank << "] " <<
     "Calculating value of objective function again..." << std::endl;
 #endif
-  if (gp->objective.compare("acceptorPeak") == 0) {
-    output2 = objAcceptorPeak(&p);
-  }
-  else if (gp->objective.compare("acceptorAvg") == 0) {
-    output2 = objAcceptorAvg(&p);
-  }
-  else if (gp->objective.compare("acceptorAvgAfterPeak") == 0) {
-    output2 = objAcceptorAvgAfterPeak(&p);
-  }
-  else if (gp->objective.compare("acceptorFinal") == 0) {
-    output2 = objAcceptorFinal(&p);
-  }
-  else {
-    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "objective function" <<
-      gp->objective << "not recognized." << std::endl;
-    exit(-1);
+  output2 = 0.0;
+  // call each objective fn and add the weighted value to the output ///////////
+  for (unsigned int ii = 0; ii < obs.size(); ii++) {
+    obj = std::get<0>(obs[ii]);
+    w = std::get<1>(obs[ii]);
+#ifdef DEBUG
+    std::cout << "objective value is " << (*obj)(&p) << " and weight is " << w << std::endl;
+#endif
+    output2 += (*obj)(&p)*w; // dereference the function pointer and call it
   }
 
   std::cout << "[" << pid << ":" << rank << "] " << "Objective 2: " << output2 << " Genome:";
