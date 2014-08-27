@@ -14,9 +14,6 @@
 #include "output.hpp"
 #include "params.hpp"
 
-typedef float (*objectiveTypeFn)(GAGenome &); // function pointer to objective
-typedef double (*objectiveFn)(Params *); // function pointer to subobjective
-
 float singleObjective(GAGenome &);
 
 float doubleObjective(GAGenome &);

@@ -58,6 +58,7 @@ float singleObjective(GAGenome &c) {
   std::cout << "[" << pid << ":" << rank << "] " <<
     "Calculating value of objective function..." << std::endl;
 #endif
+  output = 0.0;
   // set 'output' according to an objective function ///////////////////////////
   if (gp->objective.compare("acceptorPeak") == 0) {
     output = objAcceptorPeak(&p);

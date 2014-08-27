@@ -4,7 +4,6 @@
 #include <tuple>
 
 #include "gaparams.hpp"
-#include "objective.hpp"
 #include "objTuple.hpp"
 
 class dynamixGAParams {
