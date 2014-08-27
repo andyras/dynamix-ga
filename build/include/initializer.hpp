@@ -9,15 +9,9 @@
 
 typedef void (*initializerFn)(GAGenome &); // function pointer to initializer
 
-void gammasInitializer(GAGenome &g);
-
 void init_gammas(GAGenome &c, Params * p);
 
-void wavepacketInitializer(GAGenome &g);
-
 void init_wavepacket(GAGenome &c, Params * p);
-
-void wavepacketGammasInitializer(GAGenome &g);
 
 void init_wavepacketGammas(GAGenome &c, Params * p);
 
