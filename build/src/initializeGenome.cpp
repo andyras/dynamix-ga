@@ -10,9 +10,3 @@ void sensibleRandomInitializer(GAGenome &g) {
 
   return;
 }
-
-initializerFn getInitializer(GAParams * p) {
-  // XXX: this is hacked a bit to just return what I hope to use in general, the
-  // sensibleRandomInitializer.
-  return sensibleRandomInitializer;
-}

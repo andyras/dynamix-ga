@@ -31,3 +31,9 @@ objectiveFn dynamixGAParams::getObjective() {
     exit(-1);
   }
 }
+
+initializerFn dynamixGAParams::getInitializer() {
+  // XXX: this is hacked a bit to just return what I hope to use in general, the
+  // sensibleRandomInitializer.
+  return sensibleRandomInitializer;
+}

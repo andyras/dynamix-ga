@@ -11,6 +11,8 @@
 typedef float (*objectiveTypeFn)(GAGenome &); // function pointer to objective
 typedef double (*objectiveFn)(Params *); // function pointer to subobjective
 
+typedef void (*initializerFn)(GAGenome &); // function pointer to initializer
+
 class GAParams {
   public:
     std::string objectiveType = "single";

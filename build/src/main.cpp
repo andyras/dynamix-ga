@@ -122,7 +122,7 @@ int main(int argc, char **argv)
   }
 
   GA1DArrayGenome<double> genome(genomeLength, dgp.getObjectiveType(), userData);
-  genome.initializer(getInitializer(&(dgp.gp)));
+  genome.initializer(dgp.getInitializer());
 
   genome.mutator(getMutator(&(dgp.gp)));
 

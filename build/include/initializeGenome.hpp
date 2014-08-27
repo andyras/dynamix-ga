@@ -6,10 +6,6 @@
 
 #include "gaparams.hpp"
 
-typedef void (*initializerFn)(GAGenome &); // function pointer to initializer
-
 void sensibleRandomInitializer(GAGenome &g);
-
-initializerFn getInitializer(GAParams * p);
 
 #endif

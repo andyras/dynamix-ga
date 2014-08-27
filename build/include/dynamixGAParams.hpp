@@ -4,6 +4,7 @@
 #include <tuple>
 
 #include "gaparams.hpp"
+#include "initializeGenome.hpp"
 #include "objTuple.hpp"
 #include "objective.hpp"
 
@@ -17,6 +18,8 @@ public:
   // methods ///////////////////////////////////////////////////////////////////
   objectiveTypeFn getObjectiveType();
   objectiveFn getObjective();
+
+  initializerFn getInitializer();
 
 private:
   friend class boost::serialization::access;
