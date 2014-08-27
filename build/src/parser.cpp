@@ -1,6 +1,6 @@
 #include "parser.hpp"
 
-// #define DEBUG
+#define DEBUG
 // #define DEBUGFAIL
 
 void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
@@ -96,7 +96,7 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
 
   for (; getline(bash_in, line); ) {
     if (line == "[fitness]") {
-      std::cout << "WHOO" << line << std::endl;
+      getline(bash_in, line);
       while (line != "[end]") {
         // skip comment lines
         if ( line.substr(0,1) == "#" ) {
@@ -110,11 +110,22 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
           std::cerr << "line '" << line << "' has " << strs.size() << " tokens (2 expected), skipping line" << std::endl;
         }
 
+#ifdef DEBUG
+        std::cout << "Using objective function " << strs[0] << " with weight " << strs[1] << std::endl;
+#endif
+
         dgp->ot.addObjWeight(strs[0], stod(strs[1]));
 
         // get next line
+        getline(bash_in, line);
       }
     }
+  }
+
+  if (bash_in.eof()) {
+#ifdef DEBUG
+    std::cout << "Reached end of input file " << inputFile << std::endl;
+#endif
   }
 
   // close input file

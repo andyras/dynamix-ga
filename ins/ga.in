@@ -13,3 +13,8 @@ convergence=1e-5
 [[Output Files]]
 #ga.out
 [[End]]
+
+[fitness]
+acceptorPeak 1
+acceptorFinal 1
+[end]
