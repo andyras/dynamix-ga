@@ -124,7 +124,7 @@ int main(int argc, char **argv)
   GA1DArrayGenome<double> genome(genomeLength, dgp.getObjectiveType(), userData);
   genome.initializer(dgp.getInitializer());
 
-  genome.mutator(getMutator(&(dgp.gp)));
+  genome.mutator(dgp.getMutator());
 
   // initialize structures for best genomes/scores
   double initVal = 0.0;

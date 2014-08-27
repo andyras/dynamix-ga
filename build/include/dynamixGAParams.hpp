@@ -5,6 +5,7 @@
 
 #include "gaparams.hpp"
 #include "initializeGenome.hpp"
+#include "mutator.hpp"
 #include "objTuple.hpp"
 #include "objective.hpp"
 
@@ -20,6 +21,8 @@ public:
   objectiveFn getObjective();
 
   initializerFn getInitializer();
+
+  mutatorFn getMutator();
 
 private:
   friend class boost::serialization::access;

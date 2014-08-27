@@ -37,3 +37,7 @@ initializerFn dynamixGAParams::getInitializer() {
   // sensibleRandomInitializer.
   return sensibleRandomInitializer;
 }
+
+mutatorFn dynamixGAParams::getMutator() {
+  return GA1DArraySensibleRandomMutator;
+}

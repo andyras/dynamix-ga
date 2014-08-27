@@ -5,10 +5,6 @@
 
 #include "gaparams.hpp"
 
-typedef int (*mutatorFn)(GAGenome &, float); // function pointer to mutator
-
 int GA1DArraySensibleRandomMutator (GAGenome &c, float pMut);
-
-mutatorFn getMutator(GAParams * p);
 
 #endif
