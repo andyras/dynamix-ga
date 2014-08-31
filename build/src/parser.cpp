@@ -81,6 +81,8 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
     else if (input_param == "pMut") { p->pMut = atof(param_val.c_str()); }
     else if (input_param == "pCross") { p->pCross = atof(param_val.c_str()); }
     else if (input_param == "convergence") { p->convergence = atof(param_val.c_str()); }
+    else if (input_param == "Da") { p->Da = atof(param_val.c_str()); }
+    else if (input_param == "Ea") { p->Ea = atof(param_val.c_str()); }
     else {
       std::cerr << "WARNING: unknown input parameter " << input_param << std::endl;
     }
@@ -97,9 +99,10 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
     if (line == "[fitness]") {
       getline(bash_in, line);
       while (line != "[end]") {
-        // skip comment lines
-        if ( line.substr(0,1) == "#" ) {
-          getline (bash_in,line);
+        // skip comments and blank lines
+        if ((line.substr(0,1) == "#") ||
+            line.find_first_not_of(" \t") == std::string::npos) {
+          getline(bash_in, line);
           continue;
         }
 
@@ -107,6 +110,7 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
         boost::split(strs, line, boost::is_any_of("\t "));
         if (strs.size() != 2) {
           std::cerr << "line '" << line << "' has " << strs.size() << " tokens (2 expected), skipping line" << std::endl;
+          continue;
         }
 
 #ifdef DEBUG
@@ -117,6 +121,30 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
 
         // get next line
         getline(bash_in, line);
+      }
+    }
+    if (line == "[paramsToChange]") {
+      getline(bash_in, line);
+      while (line != "[end]") {
+        // skip comments and blank lines
+        if ((line.substr(0,1) == "#") ||
+            line.find_first_not_of(" \t") == std::string::npos) {
+          getline(bash_in, line);
+          continue;
+        }
+
+        // check that line has three tokens
+        boost::split(strs, line, boost::is_any_of("\t "));
+        if (strs.size() != 3) {
+          std::cerr << "FORMAT ERROR: line '" << "' has " << strs.size() << " okens (3 expected), skipping line" << std::endl;
+          continue;
+        }
+
+#ifdef DEBUG
+        std::cout << "Varying parameter " << strs[0] << " between " << strs[1] << " and " << strs[2] << "." << std::endl;
+#endif
+
+        dgp->gp.paramsToChange.emplace_back(std::make_tuple(strs[0], std::stod(strs[1]), std::stod(strs[2])));
       }
     }
   }

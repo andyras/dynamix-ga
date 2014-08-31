@@ -27,6 +27,10 @@ class GAParams {
     double pCross = 0.6;
     double convergence = 0.01;
 
+    // a few system parameters not contained in Params
+    double Da;  // spacing between acceptor states
+    double Ea;  // acceptor lower band edge
+
     // variables below this line are not controlled by input file //////////////
 
     bool firstEval = true;
@@ -36,6 +40,8 @@ class GAParams {
     // upper and lower bounds for genes
     std::vector<double> lb;
     std::vector<double> ub;
+
+    std::vector< std::tuple<std::string, double, double> > paramsToChange;
 
     Params p;
 
@@ -55,12 +61,17 @@ class GAParams {
       ar & pCross;
       ar & convergence;
 
+      ar & Da;
+      ar & Ea;
+
       ar & firstEval;
       ar & bestScore;
       ar & bestGenome;
 
       ar & lb;
       ar & ub;
+
+      ar & paramsToChange;
 
       ar & p;
     }
