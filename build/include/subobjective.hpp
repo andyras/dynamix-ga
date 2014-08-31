@@ -1,5 +1,4 @@
-#ifndef __SUBOBJECTIVE__
-#define __SUBOBJECTIVE__
+#pragma once
 
 #include <params.hpp>
 #include <dynamix.hpp>
@@ -11,5 +10,3 @@ double objAcceptorAvg(Params * p);
 double objAcceptorAvgAfterPeak(Params * p);
 
 double objAcceptorFinal(Params * p);
-
-#endif

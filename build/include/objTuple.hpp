@@ -1,5 +1,4 @@
-#ifndef __OBJTUPLE__
-#define __OBJTUPLE__
+#pragma once
 
 #include <string>
 #include <tuple>
@@ -27,5 +26,3 @@ private:
     ar & weights;
   }
 };
-
-#endif

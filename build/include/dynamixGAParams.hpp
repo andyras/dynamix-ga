@@ -1,5 +1,4 @@
-#ifndef __DYNAMIXGAPARAMS__
-#define __DYNAMIXGAPARAMS__
+#pragma once
 
 #include <tuple>
 
@@ -33,5 +32,3 @@ private:
     ar & ot;
   }
 };
-
-#endif

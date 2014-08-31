@@ -1,5 +1,4 @@
-#ifndef __GAPARAMS__
-#define __GAPARAMS__
+#pragma once
 
 #include <tuple>
 #include <string>
@@ -76,5 +75,3 @@ class GAParams {
       ar & p;
     }
 };
-
-#endif

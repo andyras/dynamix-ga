@@ -1,5 +1,4 @@
-#ifndef __OBJECTIVE__
-#define __OBJECTIVE__
+#pragma once
 
 #include <mpi.h>
 #include <sys/types.h>
@@ -19,5 +18,3 @@
 float singleObjective(GAGenome &);
 
 float doubleObjective(GAGenome &);
-
-#endif

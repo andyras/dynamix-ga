@@ -1,5 +1,4 @@
-#ifndef __INITIALIZEPARAMS__
-#define __INITIALIZEPARAMS__
+#pragma once
 
 #include <dynamix.hpp>
 #include <ga-mpi/ga.h>
@@ -12,5 +11,3 @@ void init_wavepacket(GAGenome &c, Params * p);
 void init_wavepacketGammas(GAGenome &c, Params * p);
 
 void init_torsion(GAGenome &c, Params * p);
-
-#endif

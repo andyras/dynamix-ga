@@ -1,5 +1,4 @@
-#ifndef __PARSER__
-#define __PARSER__
+#pragma once
 
 #include <boost/algorithm/string.hpp>
 #include <mpi.h>
@@ -9,5 +8,3 @@
 #include "serialize_tuple.hpp"
 
 void assignGAParams(std::string inputFile, dynamixGAParams * dgp);
-
-#endif
