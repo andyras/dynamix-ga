@@ -14,6 +14,9 @@ typedef void (*initializerFn)(GAGenome &); // function pointer to initializer
 
 typedef int (*mutatorFn)(GAGenome &, float); // function pointer to mutator
 
+// paramTuple is (name of param, lower bound, upper bound)
+typedef std::tuple<std::string, double, double> paramTuple;
+
 class GAParams {
   public:
     std::string objectiveType = "single";
@@ -40,7 +43,7 @@ class GAParams {
     std::vector<double> lb;
     std::vector<double> ub;
 
-    std::vector< std::tuple<std::string, double, double> > paramsToChange;
+    std::vector<paramTuple> paramsToChange;
 
     Params p;
 

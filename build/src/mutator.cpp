@@ -9,11 +9,18 @@ int GA1DArraySensibleRandomMutator (GAGenome &c, float pMut) {
   GAParams * gp = (GAParams *) child.userData();
 
   int nMut = 0;
-  for (int ii = 0; ii < child.length(); ii++) {
+  double lb = 0.0;
+  double ub = 0.0;
+
+  for (unsigned int ii = 0; ii < gp->paramsToChange.size(); ii++) {
     if (GAFlipCoin(pMut)) {
-      child.gene(ii, GARandomFloat(gp->lb[ii], gp->ub[ii]));
+      paramTuple ptc = gp->paramsToChange[ii];
+      lb = std::get<1>(ptc);
+      ub = std::get<2>(ptc);
+      child.gene(ii, GARandomFloat(lb, ub));
       nMut++;
     }
   }
+
   return nMut;
 }

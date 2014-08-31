@@ -145,6 +145,9 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
 #endif
 
         dgp->gp.paramsToChange.emplace_back(std::make_tuple(strs[0], std::stod(strs[1]), std::stod(strs[2])));
+        if (stod(strs[1]) > stod(strs[2])) {
+          std::cerr << "WARNING: lower bound (" << strs[1] << " for '" << strs[0] << "' is greater than upper bound (" << strs[2] << ")." << std::endl;
+        }
       }
     }
   }
