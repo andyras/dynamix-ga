@@ -31,26 +31,9 @@ float singleObjective(GAGenome &c) {
   mkl_set_num_threads(p.nproc);
 
   // assign GA parameters
-  // this function is independent of the objective you are using. It determines
-  // what the relevant parameters are for the optimization.
-  if (gp->initializer.compare("g1g2g1_c") == 0) {
-    init_gammas(c, &p);
-  }
-  else if (gp->initializer.compare("wavepacket") == 0) {
-    init_wavepacket(c, &p);
-  }
-  else if (gp->initializer.compare("wavepacketGammas") == 0) {
-    init_wavepacketGammas(c, &p);
-  }
-  else if (gp->initializer.compare("torsion") == 0) {
-    init_torsion(c, &p);
-  }
-  else {
-    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp->initializer << "not recognized." << std::endl;
-    exit(-1);
-  }
+  initParamsToChange(c, &p);
 
+  initialize(&p);
   makePlots(&p);
   propagate(&p);
 
@@ -154,32 +137,15 @@ float doubleObjective(GAGenome &c) {
   mkl_set_num_threads(p.nproc);
 
   // assign GA parameters
-  // this function is independent of the objective you are using. It determines
-  // what the relevant parameters are for the optimization.
-  if (gp->initializer.compare("g1g2g1_c") == 0) {
-    init_gammas(c, &p);
-  }
-  else if (gp->initializer.compare("wavepacket") == 0) {
-    init_wavepacket(c, &p);
-  }
-  else if (gp->initializer.compare("wavepacketGammas") == 0) {
-    init_wavepacketGammas(c, &p);
-  }
-  else if (gp->initializer.compare("torsion") == 0) {
-    init_torsion(c, &p);
-  }
-  else {
-    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      gp->initializer << "not recognized." << std::endl;
-    exit(-1);
-  }
+  initParamsToChange(c, &p);
 
   // coherent propagation //////////////////////////////////////////////////////
 
   p.coherent = 1;
   p.outputDir = "./coh/";
+
+  initialize(&p);
   makePlots(&p);
-  initWavefunction(&p);
   propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////
@@ -210,8 +176,9 @@ float doubleObjective(GAGenome &c) {
   // incoherent propagation ////////////////////////////////////////////////////
   p.coherent = 0;
   p.outputDir = "./inc/";
+
+  initialize(&p);
   makePlots(&p);
-  initWavefunction(&p);
   propagate(&p);
 
   // calculate value of objective function /////////////////////////////////////

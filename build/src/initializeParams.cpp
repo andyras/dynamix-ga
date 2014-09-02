@@ -1,5 +1,7 @@
 #include "initializeParams.hpp"
 
+// #define DEBUG
+
 void init_gammas(GAGenome &c, Params * p) {
   // This function initializes the parameters which are to be changed in an
   // optimization over relaxation constants.
@@ -91,9 +93,20 @@ void initParamsToChange(GAGenome &g, Params * p) {
   bool isNaChanged = false;
   bool isDaChanged = false;
 
+#ifdef DEBUG
+  std::cout << "Changing " << gp->paramsToChange.size() << " parameters." << std::endl;
+#endif
+
   for (unsigned int ii = 0; ii < gp->paramsToChange.size(); ii++) {
     paramTuple ptc = gp->paramsToChange[ii];
     name = std::get<0>(ptc);
+
+#ifdef DEBUG
+    std::cout << "Parameter: " << std::get<0>(ptc) <<
+      " lower bound: " << std::get<1>(ptc) <<
+      " upper bound: " << std::get<2>(ptc) << std::endl;
+#endif
+
     if (name.compare("gamma1") == 0) {
       p->gamma1 = genome.gene(ii);
     }
