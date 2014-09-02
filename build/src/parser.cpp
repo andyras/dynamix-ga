@@ -136,8 +136,8 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
         // check that line has three tokens
         boost::split(strs, line, boost::is_any_of("\t "));
         if (strs.size() != 3) {
-          std::cerr << "FORMAT ERROR: line '" << "' has " << strs.size() << " okens (3 expected), skipping line" << std::endl;
-          continue;
+          std::cerr << "FORMAT ERROR: line '" << line << "' has " << strs.size() << " tokens (3 expected), skipping line" << std::endl;
+          _exit(-1);
         }
 
 #ifdef DEBUG
