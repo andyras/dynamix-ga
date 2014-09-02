@@ -1,7 +1,6 @@
 ## START INPUT PARAMETERS ##
 objectiveType=single
 doubleObjectiveType=coherence
-initializer=wavepacket
 minmax=max
 popsize=24
 pMut=0.4
@@ -23,4 +22,13 @@ acceptorFinal 1
 [paramsToChange]
 bulkGaussSigma 0.0001 0.01
 bulkGaussMu 0.0 0.01
+#gamma1 0.001 0.05
+#gamma1_c 0.001 0.05
+#gamma2 0.001 0.05
+#torsionCouplingV0 0.00001 0.001
+#torsionCouplingV1 0.00001 0.001
+#Eb 0.0 0.01
+#Ea 0.0 0.01
+Da 0.00001 0.001
+Na 1 11
 [end]

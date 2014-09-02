@@ -69,57 +69,10 @@ int main(int argc, char **argv)
   std::cout << "[" << pid << ":" << mpi_rank <<  "] Using " << gp.objectiveType << " objective function." << std::endl;
 #endif
 
-  unsigned int genomeLength = 0;
-  if (dgp.gp.initializer.compare("g1g2g1_c") == 0) {
-    genomeLength = 3;
-    dgp.gp.lb.resize(genomeLength);
-    dgp.gp.ub.resize(genomeLength);
-    for (unsigned int ii = 0; ii < 3; ii++) {
-      dgp.gp.lb[ii] = 0.001;
-      dgp.gp.ub[ii] = 0.05;
-    }
-  }
-  else if (dgp.gp.initializer.compare("wavepacket") == 0) {
-    genomeLength = 2;
-    dgp.gp.lb.resize(genomeLength);
-    dgp.gp.ub.resize(genomeLength);
-    for (unsigned int ii = 0; ii < 2; ii++) {
-      dgp.gp.lb[ii] = 0.0001; // this needs to be ~> the interlevel spacing
-      dgp.gp.ub[ii] = 0.01; // it would be nice to have these initialized by reading parameters.in
-    }
-  }
-  else if (dgp.gp.initializer.compare("wavepacketGammas") == 0) {
-    genomeLength = 5;
-    dgp.gp.lb.resize(genomeLength);
-    dgp.gp.ub.resize(genomeLength);
-    for (unsigned int ii = 0; ii < 3; ii++) {
-      dgp.gp.lb[ii] = 0.001;
-      dgp.gp.ub[ii] = 0.05;
-    }
-    for (unsigned int ii = 3; ii < (3+2); ii++) {
-      dgp.gp.lb[ii] = 0.0001;
-      dgp.gp.ub[ii] = 0.01;
-    }
-  }
-  else if (dgp.gp.initializer.compare("torsion") == 0) {
-    genomeLength = 3;
-    dgp.gp.lb.resize(genomeLength);
-    dgp.gp.ub.resize(genomeLength);
-    // torsionSin2V0
-    dgp.gp.lb[0] = 0.00001;
-    dgp.gp.ub[0] = 0.001;
-    // torsionSin2V1
-    dgp.gp.lb[1] = 0.00001;
-    dgp.gp.ub[1] = 0.001;
-    // Eb
-    dgp.gp.lb[2] = dgp.gp.p.kBandEdge;
-    dgp.gp.ub[2] = dgp.gp.p.kBandTop;
-  }
-  else {
-    std::cout << "ERROR [" << __FUNCTION__ << "]: " << "variable set" <<
-      dgp.gp.initializer << "not recognized." << std::endl;
-    exit(-1);
-  }
+  unsigned int genomeLength = dgp.gp.paramsToChange.size();
+#ifdef DEBUG
+  std::cout << "[" << pid << ":" << mpi_rank <<  "] Genome size is " << genomeLength << std::endl;
+#endif
 
   GA1DArrayGenome<double> genome(genomeLength, dgp.getObjectiveType(), userData);
   genome.initializer(dgp.getInitializer());

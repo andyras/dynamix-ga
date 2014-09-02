@@ -21,7 +21,6 @@ class GAParams {
   public:
     std::string objectiveType = "single";
     std::string doubleObjectiveType = "coherence";
-    std::string initializer = "wavepacket";
     std::string minmax = "min";
 
     int popsize = 36;
@@ -55,7 +54,6 @@ class GAParams {
     void serialize(Archive & ar, const unsigned int version) {
       ar & objectiveType;
       ar & doubleObjectiveType;
-      ar & initializer;
       ar & minmax;
 
       ar & popsize;
