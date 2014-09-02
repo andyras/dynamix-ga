@@ -33,7 +33,7 @@ float singleObjective(GAGenome &c) {
   // assign GA parameters
   initParamsToChange(c, &p);
 
-  initialize(&p);
+  initialize(&p, false);
   makePlots(&p);
   propagate(&p);
 
@@ -144,7 +144,7 @@ float doubleObjective(GAGenome &c) {
   p.coherent = 1;
   p.outputDir = "./coh/";
 
-  initialize(&p);
+  initialize(&p, false);
   makePlots(&p);
   propagate(&p);
 
@@ -177,7 +177,7 @@ float doubleObjective(GAGenome &c) {
   p.coherent = 0;
   p.outputDir = "./inc/";
 
-  initialize(&p);
+  initialize(&p, false);
   makePlots(&p);
   propagate(&p);
 

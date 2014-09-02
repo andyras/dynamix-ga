@@ -54,11 +54,11 @@ void initParamsToChange(GAGenome &g, Params * p) {
       p->torsionCouplingPhi = genome.gene(ii);
     }
     else if (name.compare("Nb") == 0) {
-      p->Nb = genome.gene(ii);
+      p->Nb = static_cast<int>(genome.gene(ii));
       p->b_energies.resize(p->Nb, 0.0);
     }
     else if (name.compare("Na") == 0) {
-      p->Nc = genome.gene(ii);
+      p->Nc = static_cast<int>(genome.gene(ii));
       p->c_energies.resize(p->Nc, 0.0);
       isNaChanged = true;
     }

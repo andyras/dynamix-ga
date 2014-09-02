@@ -2,10 +2,10 @@
 objectiveType=single
 doubleObjectiveType=coherence
 minmax=max
-popsize=24
-pMut=0.4
+popsize=56
+pMut=0.1
 pCross=0.6
-convergence=1e-5
+convergence=1e-6
 Da=0.0001
 Ea=0.005
 ## END INPUT PARAMETERS ##
@@ -27,8 +27,8 @@ bulkGaussMu 0.0 0.01
 #gamma2 0.001 0.05
 #torsionCouplingV0 0.00001 0.001
 #torsionCouplingV1 0.00001 0.001
-#Eb 0.0 0.01
-#Ea 0.0 0.01
+Eb 0.0 0.01
+Ea 0.0 0.01
 Da 0.00001 0.001
 Na 1 11
 [end]
