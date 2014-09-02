@@ -148,6 +148,8 @@ void assignGAParams(std::string inputFile, dynamixGAParams * dgp) {
         if (stod(strs[1]) > stod(strs[2])) {
           std::cerr << "WARNING: lower bound (" << strs[1] << " for '" << strs[0] << "' is greater than upper bound (" << strs[2] << ")." << std::endl;
         }
+
+        getline(bash_in, line);
       }
     }
   }

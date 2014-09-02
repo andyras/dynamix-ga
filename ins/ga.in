@@ -19,3 +19,8 @@ Ea=0.005
 acceptorPeak 1
 acceptorFinal 1
 [end]
+
+[paramsToChange]
+bulkGaussSigma 0.0001 0.01
+bulkGaussMu 0.0 0.01
+[end]
