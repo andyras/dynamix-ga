@@ -28,7 +28,9 @@ float singleObjective(GAGenome &c) {
   // set number of processors for OpenMP ///////////////////////////////////////
 
   omp_set_num_threads(p.nproc);
+#ifdef __USE_MKL__
   mkl_set_num_threads(p.nproc);
+#endif
 
   // assign GA parameters
   initParamsToChange(c, &p);
@@ -134,7 +136,9 @@ float doubleObjective(GAGenome &c) {
   // set number of processors for OpenMP ///////////////////////////////////////
 
   omp_set_num_threads(p.nproc);
+#ifdef __USE_MKL__
   mkl_set_num_threads(p.nproc);
+#endif
 
   // assign GA parameters
   initParamsToChange(c, &p);
